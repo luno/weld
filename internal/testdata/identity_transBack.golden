@@ -1,0 +1,2 @@
+example/identity/email/client/logical.Backends[1]: *example/identity/email/db.EmailDB
+example/identity/users/client/logical.Backends[2]: *example/identity/users/db.UsersDB, example/identity/email.Client

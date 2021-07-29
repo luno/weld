@@ -1,0 +1,10 @@
+syntax = "proto3";
+package exchangepb;
+
+import "google/protobuf/timestamp.proto";
+
+service Exchange {
+  rpc Ping (Empty) returns (Empty) {}
+}
+
+message Empty {}

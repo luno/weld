@@ -1,0 +1,10 @@
+syntax = "proto3";
+package emailpb;
+
+import "google/protobuf/timestamp.proto";
+
+service Email {
+  rpc Ping (Empty) returns (Empty) {}
+}
+
+message Empty {}

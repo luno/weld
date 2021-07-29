@@ -1,0 +1,88 @@
+package: state
+tags: '!dev'
+backendstype: exchange_ops.Backends
+backendsname: Backends
+imports:
+  example/exchange:
+    name: exchange
+    pkgpath: example/exchange
+    aliased: false
+  example/exchange/db:
+    name: exchange_db
+    pkgpath: example/exchange/db
+    aliased: true
+  example/exchange/ops:
+    name: exchange_ops
+    pkgpath: example/exchange/ops
+    aliased: true
+  example/external/versioned:
+    name: versioned
+    pkgpath: example/external/versioned
+    aliased: false
+  example/external/versioned/v1:
+    name: versioned_v1
+    pkgpath: example/external/versioned/v1
+    aliased: true
+  example/identity/email:
+    name: email
+    pkgpath: example/identity/email
+    aliased: false
+  example/identity/email/client/grpc:
+    name: email_client_grpc
+    pkgpath: example/identity/email/client/grpc
+    aliased: true
+  example/identity/users:
+    name: users
+    pkgpath: example/identity/users
+    aliased: false
+  example/identity/users/client/grpc:
+    name: users_client_grpc
+    pkgpath: example/identity/users/client/grpc
+    aliased: true
+deps:
+- type: email.Client
+  var: email
+  getter: Email
+  provider:
+    funcpkg: email_client_grpc
+    funcname: New
+    returnserr: true
+    takesbcks: false
+    errwrapmsg: email client grpc new
+- type: '*exchange_db.ExchangeDB'
+  var: exchangeDB
+  getter: ExchangeDB
+  provider:
+    funcpkg: exchange_db
+    funcname: Connect
+    returnserr: true
+    takesbcks: false
+    errwrapmsg: exchange db connect
+- type: chan<- exchange.Model
+  var: modelChan
+  getter: ModelChan
+  provider:
+    funcpkg: ""
+    funcname: NewModelChan
+    returnserr: false
+    takesbcks: false
+    errwrapmsg: exchange state new model chan
+- type: users.Client
+  var: users
+  getter: Users
+  provider:
+    funcpkg: users_client_grpc
+    funcname: New
+    returnserr: true
+    takesbcks: false
+    errwrapmsg: users client grpc new
+- type: '*versioned_v1.Service'
+  var: versioned
+  getter: Versioned
+  provider:
+    funcpkg: versioned
+    funcname: New
+    returnserr: false
+    takesbcks: false
+    errwrapmsg: versioned new
+transbcks: []

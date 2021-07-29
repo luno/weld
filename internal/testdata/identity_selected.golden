@@ -1,0 +1,10 @@
+Func[1]: func example/external/mail.New(opts ...example/external/mail.option) (*example/external/mail.Mailer, error)
+Func[1]: func example/external/mail/mail.New() (*example/external/mail/mail.MailerLegacy, error)
+Func[1]: func example/identity/email/db.Connect() (*example/identity/email/db.EmailDB, error)
+Func[1]: func example/identity/users/db.Connect() (*example/identity/users/db.UsersDB, error)
+Bind[1]: example/exchange.Client(*example/exchange/client/grpc.client)
+Bind[1]: example/identity/email.Client(*example/identity/email/client/logical.client)
+Bind[1]: example/identity/users.Client(*example/identity/users/client/logical.client)
+Func[1]: func example/exchange/client/grpc.New() (*example/exchange/client/grpc.client, error)
+Func[1]: func example/identity/email/client/logical.New(b example/identity/email/client/logical.Backends) *example/identity/email/client/logical.client
+Func[1]: func example/identity/users/client/logical.New(b example/identity/users/client/logical.Backends) *example/identity/users/client/logical.client

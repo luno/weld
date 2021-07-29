@@ -1,0 +1,10 @@
+syntax = "proto3";
+package userspb;
+
+import "google/protobuf/timestamp.proto";
+
+service Users {
+  rpc Ping (Empty) returns (Empty) {}
+}
+
+message Empty {}

@@ -1,0 +1,16 @@
+Set[10]: (inline)
+  Set[1]: var example/exchange/state.ChanProvider
+    Func[1]: func example/exchange/state.NewModelChan() chan<- example/exchange.Model
+  Set[9]: var example/backends/providers.WeldDev
+    Set[3]: var example/backends/providers.Dev
+      Func[1]: func example/exchange/client/dev.Make(b example/exchange/client/logical.Backends) (example/exchange.Client, error)
+      Func[1]: func example/identity/users/client/dev.Make(b example/identity/users/client/logical.Backends) (example/identity/users.Client, error)
+      Func[1]: func example/identity/email/client/dev.Make(b example/identity/email/client/logical.Backends) (example/identity/email.Client, error)
+    Set[3]: var example/backends/providers.DB
+      Func[1]: func example/identity/email/db.Connect() (*example/identity/email/db.EmailDB, error)
+      Func[1]: func example/identity/users/db.Connect() (*example/identity/users/db.UsersDB, error)
+      Func[1]: func example/exchange/db.Connect() (*example/exchange/db.ExchangeDB, error)
+    Set[3]: var example/backends/providers.External
+      Func[1]: func example/external/mail.New(opts ...example/external/mail.option) (*example/external/mail.Mailer, error)
+      Func[1]: func example/external/mail/mail.New() (*example/external/mail/mail.MailerLegacy, error)
+      Func[1]: func example/external/versioned.New() *example/external/versioned/v1.Service

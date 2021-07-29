@@ -1,0 +1,3 @@
+example/exchange/client/logical.Backends[3]: *example/exchange/db.ExchangeDB, example/identity/email.Client, example/identity/users.Client
+example/identity/email/client/logical.Backends[1]: *example/identity/email/db.EmailDB
+example/identity/users/client/logical.Backends[2]: *example/identity/users/db.UsersDB, example/identity/email.Client

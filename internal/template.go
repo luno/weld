@@ -33,8 +33,8 @@ import (
 
 func Make{{.BackendsName}}() ({{.BackendsType}}, error) {
 	var (
-		b backendsImpl
-		err error
+		b backendsImpl{{if .Deps}}
+		err error{{end}}
 	)
 
 {{range .Deps }}

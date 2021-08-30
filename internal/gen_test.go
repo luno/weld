@@ -98,6 +98,11 @@ func TestGenerate(t *testing.T) {
 			WorkDir: "example/empty/state",
 			Tags:    "!dev",
 		},
+		{
+			Name:    "no_err",
+			WorkDir: "example/no_err/state",
+			Tags:    "!dev",
+		},
 	}
 
 	for _, test := range tests {

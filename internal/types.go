@@ -179,6 +179,17 @@ type TplData struct {
 	TransBcks []string //  _ email_logical.Backends = (*backendsImpl)(nil)
 }
 
+// DepsReturnErr returns true if any dependency returns an error. This
+// determines whether or not `err` should be declared.
+func (t TplData) DepsReturnErr() bool {
+	for _, d := range t.Deps {
+		if d.Provider.ReturnsErr {
+			return true
+		}
+	}
+	return false
+}
+
 type TplDep struct {
 	Type     string //  *email_db.EmailDB
 	Var      string //  emailDB

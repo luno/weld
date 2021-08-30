@@ -1,0 +1,16 @@
+package: state
+tags: '!dev'
+backendstype: Backends
+backendsname: Backends
+imports: {}
+deps:
+- type: bool
+  var: foo
+  getter: Foo
+  provider:
+    funcpkg: ""
+    funcname: foo
+    returnserr: false
+    takesbcks: false
+    errwrapmsg: no_err state foo
+transbcks: []

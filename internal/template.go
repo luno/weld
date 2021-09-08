@@ -37,18 +37,18 @@ func Make{{.BackendsName}}() ({{.BackendsType}}, error) {
 		err error{{end}}
 	)
 
-{{range .Deps }}
+{{range .Deps }}{{if not .IsDuplicate}}
 	{{.FormatVar}} {{if .Provider.ReturnsErr}}, err {{end}}= {{.Provider.FormatFunc}}({{.Provider.FormatArgs}})
 {{if .Provider.ReturnsErr}}if err != nil { return nil, errors.Wrap(err, "{{.Provider.ErrWrapMsg}}") }{{end}}
-{{end}}
+{{end}}{{end}}
 
 	return &b, nil
 }
 
 type backendsImpl struct {
-{{range .Deps -}}
+{{range .Deps}}{{if not .IsDuplicate -}}
 	{{.Var}} {{.Type}}
-{{end}}
+{{end}}{{end}}
 }
 
 {{range .Deps}}
@@ -160,11 +160,25 @@ func makeTplData(local *packages.Package, tags string, nodes []Node, specBcks Ba
 	pkgCache.Add(specBcks.Package)
 
 	var deps []TplDep
+	// NOTE: union dedupes on the getter name. That ensures we don't have
+	// multiple getters in the Backends interface with the same name. But when
+	// we create backendsImpl, we additionally need to dedupe on the var name.
+	// For example, Foo and GetFoo are different getters, but the fields they
+	// access would both be called foo. That would lead to a duplicate field in
+	// the backendsImpl struct.
+	uniqVars := make(map[string]bool)
 	for _, dep := range union(specBcks, transBcks) {
 		d, err := makeTplDep(pkgCache, nodes, dep.Getter, dep.Type)
 		if err != nil {
 			return nil, err
 		}
+
+		if uniqVars[d.Var] {
+			// We don't need to populate this field and we don't need it in
+			// backendsImpl.
+			d.IsDuplicate = true
+		}
+		uniqVars[d.Var] = true
 
 		deps = append(deps, *d)
 	}

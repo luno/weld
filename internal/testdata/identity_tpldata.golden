@@ -47,6 +47,7 @@ deps:
 - type: email.Client
   var: email
   getter: Email
+  isduplicate: false
   provider:
     funcpkg: email_client_logical
     funcname: New
@@ -56,6 +57,7 @@ deps:
 - type: '*email_db.EmailDB'
   var: emailDB
   getter: EmailDB
+  isduplicate: false
   provider:
     funcpkg: email_db
     funcname: Connect
@@ -65,6 +67,7 @@ deps:
 - type: exchange.Client
   var: exchange
   getter: Exchange
+  isduplicate: false
   provider:
     funcpkg: exchange_client_grpc
     funcname: New
@@ -74,6 +77,7 @@ deps:
 - type: '*mail.Mailer'
   var: mailer
   getter: Mailer
+  isduplicate: false
   provider:
     funcpkg: mail
     funcname: New
@@ -83,6 +87,7 @@ deps:
 - type: '*mail_mail.MailerLegacy'
   var: mailerLegacy
   getter: MailerLegacy
+  isduplicate: false
   provider:
     funcpkg: mail_mail
     funcname: New
@@ -92,6 +97,7 @@ deps:
 - type: users.Client
   var: users
   getter: Users
+  isduplicate: false
   provider:
     funcpkg: users_client_logical
     funcname: New
@@ -101,6 +107,7 @@ deps:
 - type: '*users_db.UsersDB'
   var: usersDB
   getter: UsersDB
+  isduplicate: false
   provider:
     funcpkg: users_db
     funcname: Connect

@@ -1,0 +1,21 @@
+Set[13]: (inline)
+  Set[12]: var example/backends/providers.WeldProd
+    Set[6]: var example/backends/providers.GRPC
+      Set[2]: var example/identity/users/client/grpc.Provider
+        Func[1]: func example/identity/users/client/grpc.New() (*example/identity/users/client/grpc.client, error)
+        Bind[1]: example/identity/users.Client(*example/identity/users/client/grpc.client)
+      Set[2]: var example/identity/email/client/grpc.Provider
+        Func[1]: func example/identity/email/client/grpc.New() (*example/identity/email/client/grpc.client, error)
+        Bind[1]: example/identity/email.Client(*example/identity/email/client/grpc.client)
+      Set[2]: var example/exchange/client/grpc.Provider
+        Func[1]: func example/exchange/client/grpc.New() (*example/exchange/client/grpc.client, error)
+        Bind[1]: example/exchange.Client(*example/exchange/client/grpc.client)
+    Set[3]: var example/backends/providers.DB
+      Func[1]: func example/identity/email/db.Connect() (*example/identity/email/db.EmailDB, error)
+      Func[1]: func example/identity/users/db.Connect() (*example/identity/users/db.UsersDB, error)
+      Func[1]: func example/exchange/db.Connect() (*example/exchange/db.ExchangeDB, error)
+    Set[3]: var example/backends/providers.External
+      Func[1]: func example/external/mail.New(opts ...example/external/mail.option) (*example/external/mail.Mailer, error)
+      Func[1]: func example/external/mail/mail.New() (*example/external/mail/mail.MailerLegacy, error)
+      Func[1]: func example/external/versioned.New() *example/external/versioned/v1.Service
+  Func[1]: func example/duplicate/state.FooProvider() example/duplicate/state.FooSomething

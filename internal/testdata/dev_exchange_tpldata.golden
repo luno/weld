@@ -63,6 +63,7 @@ deps:
 - type: email.Client
   var: email
   getter: Email
+  isduplicate: false
   provider:
     funcpkg: email_client_dev
     funcname: Make
@@ -72,6 +73,7 @@ deps:
 - type: '*email_db.EmailDB'
   var: emailDB
   getter: EmailDB
+  isduplicate: false
   provider:
     funcpkg: email_db
     funcname: Connect
@@ -81,6 +83,7 @@ deps:
 - type: '*exchange_db.ExchangeDB'
   var: exchangeDB
   getter: ExchangeDB
+  isduplicate: false
   provider:
     funcpkg: exchange_db
     funcname: Connect
@@ -90,6 +93,7 @@ deps:
 - type: chan<- exchange.Model
   var: modelChan
   getter: ModelChan
+  isduplicate: false
   provider:
     funcpkg: exchange_state
     funcname: NewModelChan
@@ -99,6 +103,7 @@ deps:
 - type: users.Client
   var: users
   getter: Users
+  isduplicate: false
   provider:
     funcpkg: users_client_dev
     funcname: Make
@@ -108,6 +113,7 @@ deps:
 - type: '*users_db.UsersDB'
   var: usersDB
   getter: UsersDB
+  isduplicate: false
   provider:
     funcpkg: users_db
     funcname: Connect
@@ -117,6 +123,7 @@ deps:
 - type: '*versioned_v1.Service'
   var: versioned
   getter: Versioned
+  isduplicate: false
   provider:
     funcpkg: versioned
     funcname: New

@@ -7,6 +7,7 @@ deps:
 - type: bool
   var: foo
   getter: Foo
+  isduplicate: false
   provider:
     funcpkg: ""
     funcname: foo

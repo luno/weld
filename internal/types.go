@@ -191,10 +191,11 @@ func (t TplData) DepsReturnErr() bool {
 }
 
 type TplDep struct {
-	Type     string //  *email_db.EmailDB
-	Var      string //  emailDB
-	Getter   string //  EmailDB
-	Provider TplProvider
+	Type        string //  *email_db.EmailDB
+	Var         string //  emailDB
+	Getter      string //  EmailDB
+	IsDuplicate bool
+	Provider    TplProvider
 }
 
 func (d TplDep) FormatVar() string {

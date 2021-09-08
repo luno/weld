@@ -1,0 +1,27 @@
+package: state
+tags: '!dev'
+backendstype: Backends
+backendsname: Backends
+imports: {}
+deps:
+- type: FooSomething
+  var: foo
+  getter: Foo
+  isduplicate: false
+  provider:
+    funcpkg: ""
+    funcname: FooProvider
+    returnserr: false
+    takesbcks: false
+    errwrapmsg: duplicate state foo provider
+- type: FooSomething
+  var: foo
+  getter: GetFoo
+  isduplicate: true
+  provider:
+    funcpkg: ""
+    funcname: FooProvider
+    returnserr: false
+    takesbcks: false
+    errwrapmsg: duplicate state foo provider
+transbcks: []

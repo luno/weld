@@ -206,7 +206,7 @@ type TplProvider struct {
 	FuncPkg    string //  email_db
 	FuncName   string //  Connect
 	ReturnsErr bool   //  s.email, err = email_db.Connect()
-	TakesBcks  bool   //  email_db.Connect(&b)
+	Params     []string
 	ErrWrapMsg string //  return nil, errors.Wrap(err, "email db connect")
 }
 
@@ -218,10 +218,7 @@ func (p TplProvider) FormatFunc() string {
 }
 
 func (p TplProvider) FormatArgs() string {
-	if p.TakesBcks {
-		return "&b"
-	}
-	return ""
+	return strings.Join(p.Params, ", ")
 }
 
 type TplImport struct {

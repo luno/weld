@@ -68,7 +68,8 @@ deps:
     funcpkg: email_client_dev
     funcname: Make
     returnserr: true
-    takesbcks: true
+    params:
+    - '&b'
     errwrapmsg: email client dev make
 - type: '*email_db.EmailDB'
   var: emailDB
@@ -78,7 +79,7 @@ deps:
     funcpkg: email_db
     funcname: Connect
     returnserr: true
-    takesbcks: false
+    params: []
     errwrapmsg: email db connect
 - type: '*exchange_db.ExchangeDB'
   var: exchangeDB
@@ -88,7 +89,7 @@ deps:
     funcpkg: exchange_db
     funcname: Connect
     returnserr: true
-    takesbcks: false
+    params: []
     errwrapmsg: exchange db connect
 - type: chan<- exchange.Model
   var: modelChan
@@ -98,7 +99,7 @@ deps:
     funcpkg: exchange_state
     funcname: NewModelChan
     returnserr: false
-    takesbcks: false
+    params: []
     errwrapmsg: exchange state new model chan
 - type: users.Client
   var: users
@@ -108,7 +109,8 @@ deps:
     funcpkg: users_client_dev
     funcname: Make
     returnserr: true
-    takesbcks: true
+    params:
+    - '&b'
     errwrapmsg: users client dev make
 - type: '*users_db.UsersDB'
   var: usersDB
@@ -118,7 +120,7 @@ deps:
     funcpkg: users_db
     funcname: Connect
     returnserr: true
-    takesbcks: false
+    params: []
     errwrapmsg: users db connect
 - type: '*versioned_v1.Service'
   var: versioned
@@ -128,7 +130,7 @@ deps:
     funcpkg: versioned
     funcname: New
     returnserr: false
-    takesbcks: false
+    params: []
     errwrapmsg: versioned new
 transbcks:
 - email_client_logical.Backends

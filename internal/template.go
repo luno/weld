@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"go/format"
 	"go/types"
-	"sort"
 	"strconv"
 	"strings"
 	"text/template"
@@ -159,6 +158,20 @@ func makeTplData(local *packages.Package, tags string, nodes []Node, specBcks Ba
 	pkgCache := NewPkgCache(local)
 	pkgCache.Add(specBcks.Package)
 
+	unionDeps := union(specBcks, transBcks)
+	sortInDependencyOrder(unionDeps, nodes)
+
+	// TODO(neil): The deps are now sorted mostly alphabetically, but also in
+	// dependency order. It would be nice if the Backends interface was just
+	// sorted alphabetically.
+
+	// We do a first pass to figure out what the var name for each dependency is.
+	// This is needed to correctly construct transitive dependencies.
+	varMap := make(map[types.Type]string)
+	for _, dep := range unionDeps {
+		varMap[dep.Type] = getter2Var(dep.Getter)
+	}
+
 	var deps []TplDep
 	// NOTE: union dedupes on the getter name. That ensures we don't have
 	// multiple getters in the Backends interface with the same name. But when
@@ -167,8 +180,8 @@ func makeTplData(local *packages.Package, tags string, nodes []Node, specBcks Ba
 	// access would both be called foo. That would lead to a duplicate field in
 	// the backendsImpl struct.
 	uniqVars := make(map[string]bool)
-	for _, dep := range union(specBcks, transBcks) {
-		d, err := makeTplDep(pkgCache, nodes, dep.Getter, dep.Type)
+	for _, dep := range unionDeps {
+		d, err := makeTplDep(pkgCache, nodes, dep.Getter, dep.Type, varMap)
 		if err != nil {
 			return nil, err
 		}
@@ -182,10 +195,6 @@ func makeTplData(local *packages.Package, tags string, nodes []Node, specBcks Ba
 
 		deps = append(deps, *d)
 	}
-
-	sort.Slice(deps, func(i, j int) bool {
-		return deps[i].Getter < deps[j].Getter
-	})
 
 	tb, err := makeTplBcks(pkgCache, transBcks)
 	if err != nil {
@@ -228,7 +237,7 @@ func makeTplBcks(pkgCache *PkgCache, bcks []Backends) ([]string, error) {
 }
 
 // makeTplDep returns the template dependency and template imports of the dependency.
-func makeTplDep(pkgCache *PkgCache, nodes []Node, getter string, dep types.Type) (*TplDep, error) {
+func makeTplDep(pkgCache *PkgCache, nodes []Node, getter string, dep types.Type, varMap map[types.Type]string) (*TplDep, error) {
 	for _, node := range nodes {
 		if node.Type == NodeTypeBind {
 			if !types.Identical(node.BindInterface, dep) {
@@ -239,7 +248,7 @@ func makeTplDep(pkgCache *PkgCache, nodes []Node, getter string, dep types.Type)
 				return nil, err
 			}
 
-			implDep, err := makeTplDep(pkgCache, nodes, getter, node.BindImpl)
+			implDep, err := makeTplDep(pkgCache, nodes, getter, node.BindImpl, varMap)
 			if err != nil {
 				return nil, err
 			}
@@ -273,6 +282,11 @@ func makeTplDep(pkgCache *PkgCache, nodes []Node, getter string, dep types.Type)
 
 			providerFuncName := node.FuncObj.Name()
 
+			params, err := getParams(node.FuncSig, varMap)
+			if err != nil {
+				return nil, errors.Wrap(err, "error getting params")
+			}
+
 			return &TplDep{
 				Type:   typeRef,
 				Var:    getter2Var(getter),
@@ -281,7 +295,7 @@ func makeTplDep(pkgCache *PkgCache, nodes []Node, getter string, dep types.Type)
 					FuncPkg:    pkgCache.Name(node.FuncObj.Pkg()),
 					FuncName:   providerFuncName,
 					ReturnsErr: returnsErr(node.FuncSig),
-					TakesBcks:  takesBcks(node.FuncSig),
+					Params:     params,
 					ErrWrapMsg: makeWrapMsg(node.FuncObj.Pkg().Path(), providerFuncName),
 				},
 			}, nil
@@ -523,4 +537,39 @@ func getTypePkgs(tl ...types.Type) ([]*types.Package, error) {
 	}
 
 	return res, nil
+}
+
+// getParams returns the string representations of the parameters that should be
+// passed to a function provider. For example, given the weld output:
+//
+//   b.dep, err := MakeDep(&b)
+//   if err != nil {
+//     return nil, err
+//   }
+//
+// this function returns []string{"&b"}.
+func getParams(typ *types.Signature, varMap map[types.Type]string) (params []string, err error) {
+	for i := 0; i < typ.Params().Len(); i++ {
+		p := typ.Params().At(i)
+		if isBackends(p.Type()) {
+			params = append(params, "&b")
+			continue
+		}
+
+		if typ.Variadic() {
+			// TODO(neil): Variadic parameters are often used for options.
+			// We skip those for now.
+			continue
+		}
+
+		v := varMap[p.Type()]
+		if v == "" {
+			return nil, errors.New("param type not found in var map", j.MKV{
+				"param_type": p.Type().String(),
+				"sig":        typ.String(),
+			})
+		}
+		params = append(params, "b."+v)
+	}
+	return params, nil
 }

@@ -12,6 +12,6 @@ deps:
     funcpkg: ""
     funcname: foo
     returnserr: false
-    takesbcks: false
+    params: []
     errwrapmsg: no_err state foo
 transbcks: []

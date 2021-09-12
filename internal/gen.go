@@ -145,8 +145,7 @@ func selectNodes(root *Node, bcks Backends) ([]Node, []Backends, error) {
 						continue
 					}
 
-					// TODO(corver): Add support for other dependencies.
-					return nil, nil, errWithPos(selectResult.Node.FuncObj, "unsupported transitive dependency (only Backends supported currently)")
+					selector.AddDep(p.Type())
 				}
 			}
 		}
@@ -233,9 +232,6 @@ func makeSpecBackends(pkg *packages.Package, expr ast.Expr) (Backends, bool, err
 	}
 
 	deps := union(Backends{}, bl)
-	sort.Slice(deps, func(i, j int) bool {
-		return deps[i].Getter < deps[j].Getter
-	})
 
 	typ := types.NewNamed(
 		types.NewTypeName(0, pkg.Types, "Backends", nil),
@@ -478,4 +474,95 @@ func findSpecParams(pkg *packages.Package) (ast.Expr, ast.Expr, error) {
 	}
 
 	return nil, nil, errors.New("top level weld spec not found. Expect `var _ = weld.NewSpec(...)`")
+}
+
+// sortInDependencyOrder orders the dependencies such that transitive
+// dependencies are only used after they've been created. For example, given
+//
+//   b.foo = MakeFoo(b.bar)
+//
+// we expect b.bar to be set before setting b.foo.
+// Additionally, dependencies are sorted alphabetically so that the ordering
+// is deterministic.
+//
+// TODO(neil): Optimise this. It's a little messy, and makes two copies of deps.
+func sortInDependencyOrder(deps []BackendsDep, nodes []Node) {
+	// Sort alphabetically first. We'll rearrange if there are dependencies, but
+	// this is the ordering we start with.
+	sort.Slice(deps, func(i, j int) bool {
+		varI, varJ := getter2Var(deps[i].Getter), getter2Var(deps[j].Getter)
+		if varI == varJ {
+			return deps[i].Getter < deps[j].Getter
+		}
+		return varI < varJ
+	})
+
+	nodeDepsMap := getNodeDepsMap(nodes)
+
+	q := make([]BackendsDep, 0, len(deps))
+	for _, d := range deps {
+		q = append(q, d)
+	}
+
+	var (
+		result    = make([]BackendsDep, 0, len(q))
+		resultMap = make(map[types.Type]bool)
+		i         = 0
+		target    = len(deps)
+	)
+	for len(q) > 0 {
+		i++
+		if i > target {
+			panic("dependency cycle detected")
+		}
+		n := q[0]
+		q = q[1:]
+		allFound := true
+		for k := range nodeDepsMap[n.Type] {
+			if !resultMap[k] {
+				allFound = false
+				break
+			}
+		}
+		if allFound {
+			result = append(result, n)
+			resultMap[n.Type] = true
+			i = 0
+			target = len(q)
+		} else {
+			q = append(q, n)
+		}
+	}
+
+	for i := range result {
+		deps[i] = result[i]
+	}
+}
+
+func getNodeDepsMap(nodes []Node) map[types.Type]map[types.Type]bool {
+	nodeMap := make(map[types.Type]map[types.Type]bool)
+	for _, n := range nodes {
+		if n.Type != NodeTypeFunc {
+			continue
+		}
+		for i := 0; i < n.FuncSig.Params().Len(); i++ {
+			t := n.FuncSig.Params().At(i).Type()
+			if isBackends(t) {
+				continue
+			}
+
+			// If the function is variadic and this is the last parameter we
+			// can ignore it. We assume that variadic parameters are not
+			// dependencies, but rather functional options.
+			if i == n.FuncSig.Params().Len()-1 && n.FuncSig.Variadic() {
+				continue
+			}
+
+			if nodeMap[n.FuncResult] == nil {
+				nodeMap[n.FuncResult] = make(map[types.Type]bool)
+			}
+			nodeMap[n.FuncResult][t] = true
+		}
+	}
+	return nodeMap
 }

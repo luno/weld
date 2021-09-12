@@ -52,7 +52,8 @@ deps:
     funcpkg: email_client_logical
     funcname: New
     returnserr: false
-    takesbcks: true
+    params:
+    - '&b'
     errwrapmsg: email client logical new
 - type: '*email_db.EmailDB'
   var: emailDB
@@ -62,7 +63,7 @@ deps:
     funcpkg: email_db
     funcname: Connect
     returnserr: true
-    takesbcks: false
+    params: []
     errwrapmsg: email db connect
 - type: exchange.Client
   var: exchange
@@ -72,7 +73,7 @@ deps:
     funcpkg: exchange_client_grpc
     funcname: New
     returnserr: true
-    takesbcks: false
+    params: []
     errwrapmsg: exchange client grpc new
 - type: '*mail.Mailer'
   var: mailer
@@ -82,7 +83,7 @@ deps:
     funcpkg: mail
     funcname: New
     returnserr: true
-    takesbcks: false
+    params: []
     errwrapmsg: mail new
 - type: '*mail_mail.MailerLegacy'
   var: mailerLegacy
@@ -92,7 +93,7 @@ deps:
     funcpkg: mail_mail
     funcname: New
     returnserr: true
-    takesbcks: false
+    params: []
     errwrapmsg: mail new
 - type: users.Client
   var: users
@@ -102,7 +103,8 @@ deps:
     funcpkg: users_client_logical
     funcname: New
     returnserr: false
-    takesbcks: true
+    params:
+    - '&b'
     errwrapmsg: users client logical new
 - type: '*users_db.UsersDB'
   var: usersDB
@@ -112,7 +114,7 @@ deps:
     funcpkg: users_db
     funcname: Connect
     returnserr: true
-    takesbcks: false
+    params: []
     errwrapmsg: users db connect
 transbcks:
 - email_client_logical.Backends

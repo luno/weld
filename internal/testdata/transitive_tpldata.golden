@@ -1,0 +1,54 @@
+package: state
+tags: '!dev'
+backendstype: Backends
+backendsname: Backends
+imports:
+  example/transitive/ops:
+    name: transitive_ops
+    pkgpath: example/transitive/ops
+    aliased: true
+deps:
+- type: transitive_ops.Foo
+  var: foo
+  getter: Foo
+  isduplicate: false
+  provider:
+    funcpkg: transitive_ops
+    funcname: NewFoo
+    returnserr: true
+    params: []
+    errwrapmsg: transitive ops new foo
+- type: transitive_ops.Qux
+  var: qux
+  getter: Qux
+  isduplicate: false
+  provider:
+    funcpkg: transitive_ops
+    funcname: NewQux
+    returnserr: true
+    params: []
+    errwrapmsg: transitive ops new qux
+- type: transitive_ops.Bar
+  var: bar
+  getter: Bar
+  isduplicate: false
+  provider:
+    funcpkg: transitive_ops
+    funcname: NewBar
+    returnserr: false
+    params:
+    - b.foo
+    errwrapmsg: transitive ops new bar
+- type: transitive_ops.Baz
+  var: baz
+  getter: Baz
+  isduplicate: false
+  provider:
+    funcpkg: transitive_ops
+    funcname: NewBaz
+    returnserr: false
+    params:
+    - b.bar
+    - b.qux
+    errwrapmsg: transitive ops new baz
+transbcks: []

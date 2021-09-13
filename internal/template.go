@@ -159,7 +159,10 @@ func makeTplData(local *packages.Package, tags string, nodes []Node, specBcks Ba
 	pkgCache.Add(specBcks.Package)
 
 	unionDeps := union(specBcks, transBcks)
-	sortInDependencyOrder(unionDeps, nodes)
+	err := sortInDependencyOrder(unionDeps, nodes)
+	if err != nil {
+		return nil, errors.Wrap(err, "error sorting in dependency order")
+	}
 
 	// TODO(neil): The deps are now sorted mostly alphabetically, but also in
 	// dependency order. It would be nice if the Backends interface was just

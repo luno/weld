@@ -2,6 +2,7 @@ package internal
 
 import (
 	"context"
+	"fmt"
 	"go/ast"
 	"go/token"
 	"go/types"
@@ -486,15 +487,11 @@ func findSpecParams(pkg *packages.Package) (ast.Expr, ast.Expr, error) {
 // is deterministic.
 //
 // TODO(neil): Optimise this. It's a little messy, and makes two copies of deps.
-func sortInDependencyOrder(deps []BackendsDep, nodes []Node) {
+func sortInDependencyOrder(deps []BackendsDep, nodes []Node) error {
 	// Sort alphabetically first. We'll rearrange if there are dependencies, but
 	// this is the ordering we start with.
 	sort.Slice(deps, func(i, j int) bool {
-		varI, varJ := getter2Var(deps[i].Getter), getter2Var(deps[j].Getter)
-		if varI == varJ {
-			return deps[i].Getter < deps[j].Getter
-		}
-		return varI < varJ
+		return deps[i].Getter < deps[j].Getter
 	})
 
 	nodeDepsMap := getNodeDepsMap(nodes)
@@ -513,7 +510,14 @@ func sortInDependencyOrder(deps []BackendsDep, nodes []Node) {
 	for len(q) > 0 {
 		i++
 		if i > target {
-			panic("dependency cycle detected")
+			var unresolved []string
+			for _, d := range q {
+				unresolved = append(unresolved, d.Getter)
+			}
+			return errors.New("unresolved dependency or dependency cycle", j.MKV{
+				"unresolved": fmt.Sprintf("%v", unresolved),
+				"resolution": "Make sure that at least one Backends provides each transitive dependency, and that there aren't any transitive dependency cycles",
+			})
 		}
 		n := q[0]
 		q = q[1:]
@@ -537,6 +541,8 @@ func sortInDependencyOrder(deps []BackendsDep, nodes []Node) {
 	for i := range result {
 		deps[i] = result[i]
 	}
+
+	return nil
 }
 
 func getNodeDepsMap(nodes []Node) map[types.Type]map[types.Type]bool {
@@ -545,8 +551,8 @@ func getNodeDepsMap(nodes []Node) map[types.Type]map[types.Type]bool {
 		if n.Type != NodeTypeFunc {
 			continue
 		}
-		for i := 0; i < n.FuncSig.Params().Len(); i++ {
-			t := n.FuncSig.Params().At(i).Type()
+		for i, p := range tupleSlice(n.FuncSig.Params()) {
+			t := p.Type()
 			if isBackends(t) {
 				continue
 			}

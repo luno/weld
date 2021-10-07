@@ -113,6 +113,10 @@ func TestGenerate(t *testing.T) {
 			WorkDir: "example/transitive/state",
 			Tags:    "!dev",
 		},
+		{
+			Name:    "samevar",
+			WorkDir: "example/samevar/state",
+		},
 	}
 
 	for _, test := range tests {

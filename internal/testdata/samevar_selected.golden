@@ -1,0 +1,2 @@
+Func[1]: func example/samevar/pool.NewBarPool() *example/samevar/pool.BarPool
+Func[1]: func example/samevar/pool.NewFooPool() *example/samevar/pool.FooPool

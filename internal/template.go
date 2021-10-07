@@ -182,19 +182,32 @@ func makeTplData(local *packages.Package, tags string, nodes []Node, specBcks Ba
 	// For example, Foo and GetFoo are different getters, but the fields they
 	// access would both be called foo. That would lead to a duplicate field in
 	// the backendsImpl struct.
-	uniqVars := make(map[string]bool)
+	//
+	// Additionally, if the fields they access have the same name but different
+	// types, we include both but append a sequence number to the field name to
+	// avoid conflicts.
+	uniqVars := make(map[string]string)
 	for _, dep := range unionDeps {
 		d, err := makeTplDep(pkgCache, nodes, dep.Getter, dep.Type, varMap)
 		if err != nil {
 			return nil, err
 		}
 
-		if uniqVars[d.Var] {
-			// We don't need to populate this field and we don't need it in
-			// backendsImpl.
-			d.IsDuplicate = true
+		orig := d.Var
+		n := 1
+		for {
+			prev := uniqVars[d.Var]
+			if prev == "" {
+				uniqVars[d.Var] = d.Type
+				break
+			}
+			if prev == d.Type {
+				d.IsDuplicate = true
+				break
+			}
+			d.Var = orig + strconv.Itoa(n)
+			n++
 		}
-		uniqVars[d.Var] = true
 
 		deps = append(deps, *d)
 	}

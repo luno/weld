@@ -1,0 +1,3 @@
+Set[2]: (inline)
+  Func[1]: func example/samevar/pool.NewFooPool() *example/samevar/pool.FooPool
+  Func[1]: func example/samevar/pool.NewBarPool() *example/samevar/pool.BarPool

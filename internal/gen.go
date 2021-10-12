@@ -503,7 +503,7 @@ func sortInDependencyOrder(deps []BackendsDep, nodes []Node) error {
 
 	var (
 		result    = make([]BackendsDep, 0, len(q))
-		resultMap = make(map[types.Type]bool)
+		resultMap = make(map[string]bool)
 		i         = 0
 		target    = len(deps)
 	)
@@ -522,7 +522,7 @@ func sortInDependencyOrder(deps []BackendsDep, nodes []Node) error {
 		n := q[0]
 		q = q[1:]
 		allFound := true
-		for k := range nodeDepsMap[n.Type] {
+		for k := range nodeDepsMap[n.Type.String()] {
 			if !resultMap[k] {
 				allFound = false
 				break
@@ -530,7 +530,7 @@ func sortInDependencyOrder(deps []BackendsDep, nodes []Node) error {
 		}
 		if allFound {
 			result = append(result, n)
-			resultMap[n.Type] = true
+			resultMap[n.Type.String()] = true
 			i = 0
 			target = len(q)
 		} else {
@@ -545,8 +545,8 @@ func sortInDependencyOrder(deps []BackendsDep, nodes []Node) error {
 	return nil
 }
 
-func getNodeDepsMap(nodes []Node) map[types.Type]map[types.Type]bool {
-	nodeMap := make(map[types.Type]map[types.Type]bool)
+func getNodeDepsMap(nodes []Node) map[string]map[string]bool {
+	nodeMap := make(map[string]map[string]bool)
 	for _, n := range nodes {
 		if n.Type != NodeTypeFunc {
 			continue
@@ -564,10 +564,10 @@ func getNodeDepsMap(nodes []Node) map[types.Type]map[types.Type]bool {
 				continue
 			}
 
-			if nodeMap[n.FuncResult] == nil {
-				nodeMap[n.FuncResult] = make(map[types.Type]bool)
+			if nodeMap[n.FuncResult.String()] == nil {
+				nodeMap[n.FuncResult.String()] = make(map[string]bool)
 			}
-			nodeMap[n.FuncResult][t] = true
+			nodeMap[n.FuncResult.String()][t.String()] = true
 		}
 	}
 	return nodeMap

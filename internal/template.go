@@ -170,9 +170,9 @@ func makeTplData(local *packages.Package, tags string, nodes []Node, specBcks Ba
 
 	// We do a first pass to figure out what the var name for each dependency is.
 	// This is needed to correctly construct transitive dependencies.
-	varMap := make(map[types.Type]string)
+	varMap := make(map[string]string)
 	for _, dep := range unionDeps {
-		varMap[dep.Type] = getter2Var(dep.Getter)
+		varMap[dep.Type.String()] = getter2Var(dep.Getter)
 	}
 
 	var deps []TplDep
@@ -253,7 +253,7 @@ func makeTplBcks(pkgCache *PkgCache, bcks []Backends) ([]string, error) {
 }
 
 // makeTplDep returns the template dependency and template imports of the dependency.
-func makeTplDep(pkgCache *PkgCache, nodes []Node, getter string, dep types.Type, varMap map[types.Type]string) (*TplDep, error) {
+func makeTplDep(pkgCache *PkgCache, nodes []Node, getter string, dep types.Type, varMap map[string]string) (*TplDep, error) {
 	for _, node := range nodes {
 		if node.Type == NodeTypeBind {
 			if !types.Identical(node.BindInterface, dep) {
@@ -525,6 +525,8 @@ func getTypePkgs(tl ...types.Type) ([]*types.Package, error) {
 		switch t := typ.(type) {
 		case *types.Basic:
 			continue
+		case *types.Struct:
+			continue
 		case *types.Slice:
 			pl, err = getTypePkgs(t.Elem())
 		case *types.Array:
@@ -534,7 +536,10 @@ func getTypePkgs(tl ...types.Type) ([]*types.Package, error) {
 		case *types.Chan:
 			pl, err = getTypePkgs(t.Elem())
 		case *types.Named:
-			pl, err = []*types.Package{t.Obj().Pkg()}, nil
+			pkg := t.Obj().Pkg()
+			if pkg != nil {
+				pl = []*types.Package{pkg}
+			}
 		case *types.Map:
 			pl, err = getTypePkgs(t.Elem(), t.Key())
 		case *types.Signature:
@@ -564,7 +569,7 @@ func getTypePkgs(tl ...types.Type) ([]*types.Package, error) {
 //   }
 //
 // this function returns []string{"&b"}.
-func getParams(typ *types.Signature, varMap map[types.Type]string) (params []string, err error) {
+func getParams(typ *types.Signature, varMap map[string]string) (params []string, err error) {
 	for i := 0; i < typ.Params().Len(); i++ {
 		p := typ.Params().At(i)
 		if isBackends(p.Type()) {
@@ -578,7 +583,7 @@ func getParams(typ *types.Signature, varMap map[types.Type]string) (params []str
 			continue
 		}
 
-		v := varMap[p.Type()]
+		v := varMap[p.Type().String()]
 		if v == "" {
 			return nil, errors.New("param type not found in var map", j.MKV{
 				"param_type": p.Type().String(),

@@ -421,23 +421,25 @@ func smartAlias(pkgPath string) []string {
 		"dev":     true,
 		"state":   true,
 	}
-	split := strings.Split(pkgPath, "/")
+
+	pkgParts := strings.Split(pkgPath, "/")
 
 	var res []string
-	for i := len(split) - 1; i >= 0; i-- {
-		if strings.HasPrefix(split[i], "v") {
-			_, err := strconv.Atoi(split[i][1:])
+	for i := len(pkgParts) - 1; i >= 0; i-- {
+		part := strings.ReplaceAll(pkgParts[i], "-", "")
+		if strings.HasPrefix(part, "v") {
+			_, err := strconv.Atoi(part[1:])
 			if err != nil {
 				// NoReturnErr: We're checking if this is a number.
 			} else {
 				// This is a versioned import. Include the version as well as
 				// the next part.
-				res = append([]string{split[i]}, res...)
+				res = append([]string{part}, res...)
 				continue
 			}
 		}
-		res = append([]string{split[i]}, res...)
-		if split[i] == "bitx" || !more[split[i]] {
+		res = append([]string{part}, res...)
+		if part == "bitx" || !more[part] {
 			break
 		}
 	}

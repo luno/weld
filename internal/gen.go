@@ -135,9 +135,6 @@ func selectNodes(root *Node, bcks Backends) ([]Node, []Backends, error) {
 			} else {
 				for _, p := range tupleSlice(sig.Params()) {
 					if isBackends(p.Type()) {
-						if selectResult.Node.FuncSig.Params().Len() > 1 {
-							return nil, nil, errWithPos(selectResult.Node.FuncObj, "Backends must be only parameter")
-						}
 						b, err := newBackends(p.Type(), selectResult.Node.FuncObj)
 						if err != nil {
 							return nil, nil, err
@@ -145,7 +142,6 @@ func selectNodes(root *Node, bcks Backends) ([]Node, []Backends, error) {
 						selector.AddBackends(b, true)
 						continue
 					}
-
 					selector.AddDep(p.Type())
 				}
 			}

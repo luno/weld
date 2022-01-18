@@ -8,9 +8,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
-	"path/filepath"
 
 	"github.com/luno/jettison/errors"
 
@@ -57,6 +55,11 @@ func main() {
 }
 
 func run(ctx context.Context, args internal.Args) error {
+	err := internal.RemoveGenFiles(args.WorkDir)
+	if err != nil {
+		return err
+	}
+
 	res, err := internal.Generate(ctx, args)
 	if err != nil {
 		return err
@@ -67,24 +70,5 @@ func run(ctx context.Context, args internal.Args) error {
 		return errors.New("generate error")
 	}
 
-	if args.Verbose {
-		fmt.Println("Writing weld_gen.go")
-	}
-
-	target := filepath.Join(args.WorkDir, "weld_gen.go")
-	err = ioutil.WriteFile(target, res.WeldOutput, 0644)
-	if err != nil {
-		return err
-	}
-
-	if len(res.BackendsOutput) == 0 {
-		return nil
-	}
-
-	if args.Verbose {
-		fmt.Println("Writing backends_gen.go")
-	}
-
-	target = filepath.Join(args.WorkDir, "backends_gen.go")
-	return ioutil.WriteFile(target, res.BackendsOutput, 0644)
+	return internal.WriteGenFiles(res, args.WorkDir, args.Verbose)
 }

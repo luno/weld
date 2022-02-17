@@ -5,6 +5,8 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+
+	"github.com/luno/jettison/errors"
 )
 
 const (
@@ -17,13 +19,13 @@ const (
 func RemoveGenFiles(workDir string) error {
 	target := filepath.Join(workDir, weldGenFileName)
 	err := os.Remove(target)
-	if err != nil && !os.IsNotExist(err) {
+	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		return err
 	}
 
 	target = filepath.Join(workDir, backendsGenFileName)
 	err = os.Remove(target)
-	if err != nil && !os.IsNotExist(err) {
+	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		return err
 	}
 	return nil

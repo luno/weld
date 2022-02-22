@@ -17,7 +17,6 @@ import (
 
 var (
 	weldTplText = `{{if .Tags}}//go:build {{.Tags}}
-// +build {{.Tags}}
 
 {{end -}}
 package {{.Package}}

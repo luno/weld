@@ -542,6 +542,17 @@ func sortInDependencyOrder(deps []BackendsDep, nodes []Node) error {
 }
 
 func getNodeDepsMap(nodes []Node) map[string]map[string]bool {
+	// Build up a map of bind replacements. When we look up dependencies in
+	// sortInDependencyOrder, we look up by the type the Backends provides,
+	// not the type the providers provide. This map will help us map from the
+	// latter to the former in the loop further down.
+	bindMap := make(map[string]string)
+	for _, n := range nodes {
+		if n.Type == NodeTypeBind {
+			bindMap[n.BindImpl.String()] = n.BindInterface.String()
+		}
+	}
+
 	nodeMap := make(map[string]map[string]bool)
 	for _, n := range nodes {
 		if n.Type != NodeTypeFunc {
@@ -560,10 +571,15 @@ func getNodeDepsMap(nodes []Node) map[string]map[string]bool {
 				continue
 			}
 
-			if nodeMap[n.FuncResult.String()] == nil {
-				nodeMap[n.FuncResult.String()] = make(map[string]bool)
+			key := n.FuncResult.String()
+			if k, ok := bindMap[key]; ok {
+				key = k
 			}
-			nodeMap[n.FuncResult.String()][t.String()] = true
+
+			if nodeMap[key] == nil {
+				nodeMap[key] = make(map[string]bool)
+			}
+			nodeMap[key][t.String()] = true
 		}
 	}
 	return nodeMap

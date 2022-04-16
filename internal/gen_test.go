@@ -117,6 +117,10 @@ func TestGenerate(t *testing.T) {
 			Name:    "samevar",
 			WorkDir: "example/samevar/state",
 		},
+		{
+			Name:    "sort_with_bind",
+			WorkDir: "example/sort_with_bind/state",
+		},
 	}
 
 	for _, test := range tests {

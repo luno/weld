@@ -1,0 +1,47 @@
+package: state
+tags: ""
+backendstype: Backends
+backendsname: Backends
+imports:
+  example/sort_with_bind:
+    name: sort_with_bind
+    pkgpath: example/sort_with_bind
+    aliased: false
+  example/sort_with_bind/providers:
+    name: providers
+    pkgpath: example/sort_with_bind/providers
+    aliased: false
+deps:
+- type: sort_with_bind.Foo
+  var: foo
+  getter: GetFoo
+  isduplicate: false
+  provider:
+    funcpkg: providers
+    funcname: NewFoo
+    returnserr: false
+    params: []
+    errwrapmsg: providers new foo
+- type: sort_with_bind.Bar
+  var: bar
+  getter: GetBar
+  isduplicate: false
+  provider:
+    funcpkg: providers
+    funcname: NewBar
+    returnserr: false
+    params:
+    - b.foo
+    errwrapmsg: providers new bar
+- type: sort_with_bind.Baz
+  var: baz
+  getter: GetBaz
+  isduplicate: false
+  provider:
+    funcpkg: providers
+    funcname: NewBaz
+    returnserr: false
+    params:
+    - b.bar
+    errwrapmsg: providers new baz
+transbcks: []

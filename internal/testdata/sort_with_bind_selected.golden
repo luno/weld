@@ -1,0 +1,4 @@
+Bind[1]: example/sort_with_bind.Bar(*example/sort_with_bind/providers.Bar)
+Func[1]: func example/sort_with_bind/providers.NewBaz(b example/sort_with_bind.Bar) example/sort_with_bind.Baz
+Func[1]: func example/sort_with_bind/providers.NewFoo() example/sort_with_bind.Foo
+Func[1]: func example/sort_with_bind/providers.NewBar(f example/sort_with_bind.Foo) *example/sort_with_bind/providers.Bar

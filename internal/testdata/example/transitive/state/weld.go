@@ -1,4 +1,4 @@
-// +build weld
+//go:build weld
 
 package state
 

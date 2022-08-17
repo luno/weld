@@ -30,7 +30,7 @@ package weld
 // Given a spec, the weld command will generate a weld_gen.go file.
 //
 // Example:
-//  // +build weld
+//  //go:build weld
 //
 //  package state
 //

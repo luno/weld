@@ -17,11 +17,11 @@ import (
 )
 
 func Generate(ctx context.Context, args Args) (*Result, error) {
-	logf(args, "Generating state for %s\n", args.WorkDir)
+	logf(args, "Generating state for %s\n", args.InDir)
 	logf(args, "Loading ast...")
 	t0 := time.Now()
 
-	pkg, err := load(ctx, args.WorkDir, args.Env, ".")
+	pkg, err := load(ctx, args.InDir, args.Env, ".")
 	if err != nil {
 		return nil, err
 	} else if len(pkg.Errors) > 0 {
@@ -30,6 +30,14 @@ func Generate(ctx context.Context, args Args) (*Result, error) {
 			res.Errors = append(res.Errors, e)
 		}
 		return &res, nil
+	}
+
+	outPkg := pkg
+	if args.InDir != args.OutDir {
+		outPkg, err = load(ctx, args.OutDir, args.Env, ".")
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	logf(args, " done (%v)\n", time.Since(t0).Truncate(time.Millisecond))
@@ -57,7 +65,7 @@ func Generate(ctx context.Context, args Args) (*Result, error) {
 		return nil, err
 	}
 
-	tplData, err := makeTplData(pkg, args.Tags, selected, specBcks, transBcks)
+	tplData, err := makeTplData(pkg, outPkg, args.Tags, selected, specBcks, transBcks)
 	if err != nil {
 		return nil, err
 	}

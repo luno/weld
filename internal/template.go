@@ -93,8 +93,8 @@ func maybeExecBackendsTpl(tplData *TplData, bcks Backends, genBcks bool) ([]byte
 }
 
 // makeTplData returns the template data for backends and selected nodes.
-func makeTplData(local *packages.Package, tags string, nodes []Node, specBcks Backends, transBcks []Backends) (*TplData, error) {
-	pkgCache := NewPkgCache(local)
+func makeTplData(in, out *packages.Package, tags string, nodes []Node, specBcks Backends, transBcks []Backends) (*TplData, error) {
+	pkgCache := NewPkgCache(in, out)
 	pkgCache.Add(specBcks.Package)
 
 	unionDeps := union(specBcks, transBcks)
@@ -162,7 +162,7 @@ func makeTplData(local *packages.Package, tags string, nodes []Node, specBcks Ba
 	}
 
 	return &TplData{
-		Package:      local.Name,
+		Package:      out.Name,
 		Tags:         tags,
 		BackendsName: specBcks.Name,
 		BackendsType: bcksTypeRef,
@@ -262,7 +262,7 @@ func makeTplDep(pkgCache *PkgCache, nodes []Node, getter string, dep types.Type,
 	return nil, errors.New("dep no found", j.MKV{"getter": getter, "type": dep})
 }
 
-// makeTypeRef return the type reference; including package alias or without package if local.
+// makeTypeRef return the type reference; including package alias or without package if input package.
 func makeTypeRef(pkgCache *PkgCache, typ types.Type) (string, error) {
 	pkgs, err := getTypePkgs(typ)
 	if err != nil {
@@ -272,7 +272,7 @@ func makeTypeRef(pkgCache *PkgCache, typ types.Type) (string, error) {
 	res := typ.String()
 
 	for _, pkg := range pkgs {
-		if pkg.Path() == pkgCache.Local {
+		if pkg.Path() == pkgCache.In {
 			res = strings.ReplaceAll(res, pkg.Path()+".", "")
 			continue
 		}

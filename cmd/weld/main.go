@@ -9,6 +9,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/luno/jettison/errors"
 
@@ -16,6 +17,8 @@ import (
 )
 
 var (
+	in      = flag.String("in", "", "Path to package with weld spec (default current path)")
+	out     = flag.String("out", "", "Path to write output to (default is value of -in)")
 	verbose = flag.Bool("verbose", false, "Be verbose")
 	tags    = flag.String("tags", "", "Build tags to include in generated file")
 )
@@ -26,13 +29,31 @@ func fatal(err error) {
 }
 
 func getArgs() (internal.Args, error) {
-	wd, err := os.Getwd()
-	if err != nil {
-		return internal.Args{}, err
+	var err error
+	var inDir string
+	if *in != "" {
+		inDir, err = filepath.Abs(*in)
+		if err != nil {
+			return internal.Args{}, err
+		}
+	} else {
+		inDir, err = os.Getwd()
+		if err != nil {
+			return internal.Args{}, err
+		}
+	}
+
+	outDir := inDir
+	if *out != "" {
+		outDir, err = filepath.Abs(*out)
+		if err != nil {
+			return internal.Args{}, err
+		}
 	}
 
 	return internal.Args{
-		WorkDir: wd,
+		InDir:   inDir,
+		OutDir:  outDir,
 		Env:     os.Environ(),
 		Verbose: *verbose,
 		Tags:    *tags,
@@ -55,7 +76,7 @@ func main() {
 }
 
 func run(ctx context.Context, args internal.Args) error {
-	err := internal.RemoveGenFiles(args.WorkDir)
+	err := internal.RemoveGenFiles(args.OutDir)
 	if err != nil {
 		return err
 	}
@@ -70,5 +91,5 @@ func run(ctx context.Context, args internal.Args) error {
 		return errors.New("generate error")
 	}
 
-	return internal.WriteGenFiles(res, args.WorkDir, args.Verbose)
+	return internal.WriteGenFiles(res, args.OutDir, args.Verbose)
 }

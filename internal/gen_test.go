@@ -137,7 +137,8 @@ func TestGenerate(t *testing.T) {
 			_ = os.Remove(targetBcksFile)
 
 			res, err := Generate(context.Background(), Args{
-				WorkDir: targetDir,
+				InDir:   targetDir,
+				OutDir:  targetDir,
 				Env:     nil,
 				Verbose: true,
 				Tags:    test.Tags,

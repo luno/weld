@@ -10,7 +10,8 @@ import (
 )
 
 type Args struct {
-	WorkDir string
+	InDir   string
+	OutDir  string
 	Env     []string
 	Verbose bool
 	Tags    string
@@ -230,8 +231,11 @@ type TplImport struct {
 // PkgCache manages the packages used in code generation providing
 // imports including aliases and type references.
 type PkgCache struct {
-	// Local package path being code generated.
-	Local string
+	// In is the package path that has the weld spec.
+	In string
+
+	// Out is the package that generated files are being written to.
+	Out string
 
 	// Pkgs is a map of imported packages by path
 	Pkgs map[string]TplImport
@@ -251,8 +255,8 @@ func (c *PkgCache) Add(pkg *types.Package) {
 
 	pkgPath := pkg.Path()
 
-	if c.Local == pkgPath {
-		// No need to import local package.
+	if c.Out == pkgPath {
+		// No need to import output package.
 		return
 	} else if _, ok := c.Pkgs[pkgPath]; ok {
 		// Already added this package.
@@ -291,10 +295,11 @@ func (c *PkgCache) Add(pkg *types.Package) {
 	}
 }
 
-func NewPkgCache(local *packages.Package) *PkgCache {
+func NewPkgCache(in, out *packages.Package) *PkgCache {
 	return &PkgCache{
-		Local: local.PkgPath,
+		In:    in.PkgPath,
+		Out:   out.PkgPath,
 		Pkgs:  make(map[string]TplImport),
-		Names: map[string]string{local.Name: local.PkgPath},
+		Names: map[string]string{in.Name: in.PkgPath},
 	}
 }

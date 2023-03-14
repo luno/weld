@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"go/ast"
-	"go/parser"
 	"go/token"
 	"go/types"
 	"strings"
@@ -36,20 +35,6 @@ func load(ctx context.Context, wd string, env []string, pattern string) (*packag
 		Dir:        wd,
 		Env:        env,
 		BuildFlags: []string{"-tags=weld"},
-		ParseFile: func(fset *token.FileSet, parseFilename string, src []byte) (*ast.File, error) {
-			file, err := parser.ParseFile(fset, parseFilename, src, 0)
-			if err != nil {
-				return nil, err
-			}
-			for _, decl := range file.Decls {
-				// Improve performance by clearing function
-				// bodies so they do not get type checked.
-				if fd, ok := decl.(*ast.FuncDecl); ok {
-					fd.Body = nil
-				}
-			}
-			return file, nil
-		},
 	}
 
 	pkgs, err := packages.Load(cfg, "pattern="+pattern)

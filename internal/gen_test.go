@@ -40,7 +40,7 @@ func TestMain(m *testing.M) {
 			os.Exit(1)
 		}
 
-		err = ioutil.WriteFile(expect, b, 0644)
+		err = ioutil.WriteFile(expect, b, 0o644)
 		if err != nil {
 			log.Error(nil, errors.Wrap(err, "writing file"))
 			os.Exit(1)
@@ -173,11 +173,11 @@ func TestGenerate(t *testing.T) {
 			g.Assert(t, test.Name+"_"+"weldoutput", res.WeldOutput)
 			g.Assert(t, test.Name+"_"+"bcksoutput", res.BackendsOutput)
 
-			err = ioutil.WriteFile(targetWeldFile, res.WeldOutput, 0644)
+			err = ioutil.WriteFile(targetWeldFile, res.WeldOutput, 0o644)
 			require.NoError(t, err)
 
 			if len(res.BackendsOutput) > 0 {
-				err = ioutil.WriteFile(targetBcksFile, res.BackendsOutput, 0644)
+				err = ioutil.WriteFile(targetBcksFile, res.BackendsOutput, 0o644)
 				require.NoError(t, err)
 			}
 		})

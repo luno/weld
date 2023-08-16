@@ -272,7 +272,6 @@ func makeBackends(pkg *packages.Package, expr ast.Expr) (Backends, error) {
 	}
 
 	return b, nil
-
 }
 
 func isBackends(typ types.Type) bool {
@@ -484,7 +483,7 @@ func findSpecParams(pkg *packages.Package) (ast.Expr, ast.Expr, error) {
 // sortInDependencyOrder orders the dependencies such that transitive
 // dependencies are only used after they've been created. For example, given
 //
-//   b.foo = MakeFoo(b.bar)
+//	b.foo = MakeFoo(b.bar)
 //
 // we expect b.bar to be set before setting b.foo.
 // Additionally, dependencies are sorted alphabetically so that the ordering

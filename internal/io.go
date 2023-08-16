@@ -37,7 +37,7 @@ func WriteGenFiles(res *Result, workDir string, verbose bool) error {
 		fmt.Println("Writing", weldGenFileName)
 	}
 	target := filepath.Join(workDir, weldGenFileName)
-	err := ioutil.WriteFile(target, res.WeldOutput, 0644)
+	err := ioutil.WriteFile(target, res.WeldOutput, 0o644)
 	if err != nil {
 		return err
 	}
@@ -50,5 +50,5 @@ func WriteGenFiles(res *Result, workDir string, verbose bool) error {
 		fmt.Println("Writing", backendsGenFileName)
 	}
 	target = filepath.Join(workDir, backendsGenFileName)
-	return ioutil.WriteFile(target, res.BackendsOutput, 0644)
+	return ioutil.WriteFile(target, res.BackendsOutput, 0o644)
 }

@@ -504,10 +504,10 @@ func getTypePkgs(tl ...types.Type) ([]*types.Package, error) {
 // getParams returns the string representations of the parameters that should be
 // passed to a function provider. For example, given the weld output:
 //
-//   b.dep, err := MakeDep(&b)
-//   if err != nil {
-//     return nil, err
-//   }
+//	b.dep, err := MakeDep(&b)
+//	if err != nil {
+//	  return nil, err
+//	}
 //
 // this function returns []string{"&b"}.
 func getParams(typ *types.Signature, varMap map[string]string) (params []string, err error) {

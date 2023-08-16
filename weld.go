@@ -15,8 +15,9 @@
 // backends since golang doesn't support embedding interfaces with the same name or overlapping methods.
 //
 // Relation to wire syntax:
-//  Supported functions and types: wire.NewSet, wire.ProviderSet, wire.Bind, wire.Binding.
-//  Unsupported functions and types: wire.Build, wire.Struct, wire.FieldsOf, wire.Value, wire.InterfaceValue.
+//
+//	Supported functions and types: wire.NewSet, wire.ProviderSet, wire.Bind, wire.Binding.
+//	Unsupported functions and types: wire.Build, wire.Struct, wire.FieldsOf, wire.Value, wire.InterfaceValue.
 //
 // See the internal/testdata/example project for how this is used.
 package weld
@@ -30,24 +31,26 @@ package weld
 // Given a spec, the weld command will generate a weld_gen.go file.
 //
 // Example:
-//  //go:build weld
 //
-//  package state
+//	//go:build weld
 //
-//  import (
-//    ...
-//  )
+//	package state
 //
-//  //go:generate weld
+//	import (
+//	  ...
+//	)
 //
-//  var _ = weld.NewSpec(
-//     weld.NewSet(provider.WeldProd),
-//     weld.GenUnion(new(exchange_ops.Backends), new(matcher_ops.Backends))
+//	//go:generate weld
+//
+//	var _ = weld.NewSpec(
+//	   weld.NewSet(provider.WeldProd),
+//	   weld.GenUnion(new(exchange_ops.Backends), new(matcher_ops.Backends))
 //
 // Or for an alternative dev environment state:
-//  var _ = weld.NewSpec(
-//     weld.NewSet(provider.WeldDev),
-//     weld.Existing(new(state.Backends))
+//
+//	var _ = weld.NewSpec(
+//	   weld.NewSet(provider.WeldDev),
+//	   weld.Existing(new(state.Backends))
 func NewSpec(set ProviderSet, backends Backends) string {
 	return "implementation not generated, run weld"
 }
@@ -79,17 +82,17 @@ type Binding struct{}
 //
 // Example:
 //
-//  type Client interface {
-//    List()
-//  }
+//	type Client interface {
+//	  List()
+//	}
 //
-//  func New() *client {...}
+//	func New() *client {...}
 //
-//  type client struct{}
+//	type client struct{}
 //
-//  func (*client) List() {}
+//	func (*client) List() {}
 //
-//  var Provider = weld.NewSet(New, weld.Bind(new(Client), new(*client)))
+//	var Provider = weld.NewSet(New, weld.Bind(new(Client), new(*client)))
 func Bind(iface, to interface{}) Binding {
 	return Binding{}
 }
@@ -106,9 +109,10 @@ type Backends struct{}
 // Note that GenUnion is not a wire concept.
 //
 // Example:
-//  var _ = weld.NewSpec(
-//      providers.WeldProd,
-//      weld.GenUnion(new(exchange_ops.Backends), new(matcher_ops.Backends))
+//
+//	var _ = weld.NewSpec(
+//	    providers.WeldProd,
+//	    weld.GenUnion(new(exchange_ops.Backends), new(matcher_ops.Backends))
 func GenUnion(backends ...interface{}) Backends {
 	return Backends{}
 }
@@ -119,9 +123,10 @@ func GenUnion(backends ...interface{}) Backends {
 // Note that Existing is not a wire concept.
 //
 // Example:
-//  var _ = weld.NewSpec(
-//      providers.WeldDev,
-//      weld.Existing(new(state.Backends))
+//
+//	var _ = weld.NewSpec(
+//	    providers.WeldDev,
+//	    weld.Existing(new(state.Backends))
 func Existing(backends interface{}) Backends {
 	return Backends{}
 }

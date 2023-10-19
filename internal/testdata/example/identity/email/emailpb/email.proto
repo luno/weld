@@ -1,10 +1,11 @@
 syntax = "proto3";
+
 package emailpb;
 
-import "google/protobuf/timestamp.proto";
+option go_package = "github.com/luno/weld/internal/testdata/example/identity/email/emailpb";
 
 service Email {
-  rpc Ping (Empty) returns (Empty) {}
+  rpc Ping(Empty) returns (Empty) {}
 }
 
 message Empty {}

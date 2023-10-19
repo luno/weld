@@ -1,10 +1,11 @@
 syntax = "proto3";
+
 package exchangepb;
 
-import "google/protobuf/timestamp.proto";
+option go_package = "github.com/luno/weld/internal/testdata/example/exchange/exchangepb";
 
 service Exchange {
-  rpc Ping (Empty) returns (Empty) {}
+  rpc Ping(Empty) returns (Empty) {}
 }
 
 message Empty {}

@@ -1,10 +1,11 @@
 syntax = "proto3";
+
 package userspb;
 
-import "google/protobuf/timestamp.proto";
+option go_package = "github.com/luno/weld/internal/testdata/example/identity/users/userspb";
 
 service Users {
-  rpc Ping (Empty) returns (Empty) {}
+  rpc Ping(Empty) returns (Empty) {}
 }
 
 message Empty {}

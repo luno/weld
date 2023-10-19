@@ -1,3 +1,3 @@
 package emailpb
 
-//go:generate protoc --go_out=plugins=grpc:. ./email.proto
+//go:generate protoc --go_out=plugins=grpc:. --go_opt=paths=source_relative ./email.proto

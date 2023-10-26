@@ -8,7 +8,6 @@ import (
 	"go/types"
 	"strings"
 
-	"github.com/luno/jettison"
 	"github.com/luno/jettison/errors"
 	"golang.org/x/tools/go/ast/astutil"
 	"golang.org/x/tools/go/packages"
@@ -172,7 +171,7 @@ func setPos(pkg *packages.Package) {
 
 // errWithPos returns a error with a position prefix. It uses a global
 // pos function to resolve the position string. Sorry :(
-func errWithPos(p haspos, msg string, opts ...jettison.Option) error {
+func errWithPos(p haspos, msg string, opts ...errors.Option) error {
 	msg = pos(p) + ": " + msg
 	return errors.New(msg, opts...)
 }

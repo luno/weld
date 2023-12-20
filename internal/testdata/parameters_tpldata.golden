@@ -1,0 +1,38 @@
+package: state
+tags: ""
+backendstype: Backends
+backendsname: Backends
+imports:
+  context:
+    name: context
+    pkgpath: context
+    aliased: false
+params:
+- name: context
+  type: context.Context
+- name: bar
+  type: Bar
+deps:
+- type: Fizz
+  var: fizz
+  getter: GetFizz
+  isduplicate: false
+  provider:
+    funcpkg: ""
+    funcname: MakeFizz
+    returnserr: true
+    params:
+    - context
+    errwrapmsg: param state make fizz
+- type: Foo
+  var: foo
+  getter: GetFoo
+  isduplicate: false
+  provider:
+    funcpkg: ""
+    funcname: MakeFoo
+    returnserr: false
+    params:
+    - bar
+    errwrapmsg: param state make foo
+transbcks: []

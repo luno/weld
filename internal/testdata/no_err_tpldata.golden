@@ -3,6 +3,7 @@ tags: '!dev'
 backendstype: Backends
 backendsname: Backends
 imports: {}
+params: []
 deps:
 - type: bool
   var: foo

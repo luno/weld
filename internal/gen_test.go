@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -34,13 +33,13 @@ func TestMain(m *testing.M) {
 
 	// Create copies
 	for actual, expect := range copies {
-		b, err := ioutil.ReadFile(actual)
+		b, err := os.ReadFile(actual)
 		if err != nil {
 			log.Error(nil, errors.Wrap(err, "reading file"))
 			os.Exit(1)
 		}
 
-		err = ioutil.WriteFile(expect, b, 0o644)
+		err = os.WriteFile(expect, b, 0o644)
 		if err != nil {
 			log.Error(nil, errors.Wrap(err, "writing file"))
 			os.Exit(1)
@@ -121,6 +120,10 @@ func TestGenerate(t *testing.T) {
 			Name:    "sort_with_bind",
 			WorkDir: "example/sort_with_bind/state",
 		},
+		{
+			Name:    "parameters",
+			WorkDir: "example/param/state",
+		},
 	}
 
 	for _, test := range tests {
@@ -173,11 +176,11 @@ func TestGenerate(t *testing.T) {
 			g.Assert(t, test.Name+"_"+"weldoutput", res.WeldOutput)
 			g.Assert(t, test.Name+"_"+"bcksoutput", res.BackendsOutput)
 
-			err = ioutil.WriteFile(targetWeldFile, res.WeldOutput, 0o644)
+			err = os.WriteFile(targetWeldFile, res.WeldOutput, 0o644)
 			require.NoError(t, err)
 
 			if len(res.BackendsOutput) > 0 {
-				err = ioutil.WriteFile(targetBcksFile, res.BackendsOutput, 0o644)
+				err = os.WriteFile(targetBcksFile, res.BackendsOutput, 0o644)
 				require.NoError(t, err)
 			}
 		})
@@ -185,29 +188,29 @@ func TestGenerate(t *testing.T) {
 }
 
 func printBackends(w io.Writer, b Backends) {
-	fmt.Fprintf(w, "%s[%d]: ", b.Type.String(), len(b.Deps))
+	_, _ = fmt.Fprintf(w, "%s[%d]: ", b.Type.String(), len(b.Deps))
 	var deps []string
 	for _, dep := range b.Deps {
 		deps = append(deps, dep.Type.String())
 	}
 	sort.Strings(deps)
-	fmt.Fprintf(w, "%s\n", strings.Join(deps, ", "))
+	_, _ = fmt.Fprintf(w, "%s\n", strings.Join(deps, ", "))
 }
 
 func printNode(w io.Writer, node *Node, depth int, recurse bool) {
-	fmt.Fprintf(w, "%s%s[%d", strings.Repeat("  ", depth), node.Type, len(node.Deps))
+	_, _ = fmt.Fprintf(w, "%s%s[%d", strings.Repeat("  ", depth), node.Type, len(node.Deps))
 	if node.HasDups {
-		fmt.Fprint(w, ",dups")
+		_, _ = fmt.Fprint(w, ",dups")
 	}
-	fmt.Fprint(w, "]: ")
+	_, _ = fmt.Fprint(w, "]: ")
 	if node.Type == NodeTypeFunc {
-		fmt.Fprintf(w, "%s\n", node.FuncObj)
+		_, _ = fmt.Fprintf(w, "%s\n", node.FuncObj)
 	} else if node.Type == NodeTypeSet && node.VarName != "" {
-		fmt.Fprintf(w, "var %s.%s\n", node.VarPkg, node.VarName)
+		_, _ = fmt.Fprintf(w, "var %s.%s\n", node.VarPkg, node.VarName)
 	} else if node.Type == NodeTypeSet {
-		fmt.Fprintf(w, "(inline)\n")
+		_, _ = fmt.Fprintf(w, "(inline)\n")
 	} else if node.Type == NodeTypeBind {
-		fmt.Fprintf(w, "%s(%s)\n", node.BindInterface, node.BindImpl)
+		_, _ = fmt.Fprintf(w, "%s(%s)\n", node.BindInterface, node.BindImpl)
 	}
 	if !recurse {
 		return

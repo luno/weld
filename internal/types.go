@@ -176,6 +176,7 @@ type TplData struct {
 
 	// Imports are the imported packages by package path.
 	Imports   map[string]TplImport
+	Params    []TplParam
 	Deps      []TplDep
 	TransBcks []string //  _ email_logical.Backends = (*backendsImpl)(nil)
 }
@@ -189,6 +190,14 @@ func (t TplData) DepsReturnErr() bool {
 		}
 	}
 	return false
+}
+
+func (t TplData) ParamsString() string {
+	var prams []string
+	for _, p := range t.Params {
+		prams = append(prams, p.Name+" "+p.Type)
+	}
+	return strings.Join(prams, ", ")
 }
 
 type TplDep struct {
@@ -226,6 +235,11 @@ type TplImport struct {
 	Name    string
 	PkgPath string
 	Aliased bool
+}
+
+type TplParam struct {
+	Name string
+	Type string
 }
 
 // PkgCache manages the packages used in code generation providing

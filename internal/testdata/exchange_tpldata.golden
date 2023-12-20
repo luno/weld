@@ -39,6 +39,7 @@ imports:
     name: users_client_grpc
     pkgpath: example/identity/users/client/grpc
     aliased: true
+params: []
 deps:
 - type: email.Client
   var: email

@@ -63,6 +63,7 @@ imports:
     name: users_db
     pkgpath: example/identity/users/db
     aliased: true
+params: []
 deps:
 - type: email.Client
   var: email

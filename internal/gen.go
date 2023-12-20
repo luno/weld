@@ -60,12 +60,12 @@ func Generate(ctx context.Context, args Args) (*Result, error) {
 		return nil, err
 	}
 
-	selected, transBcks, err := selectNodes(root, specBcks)
+	selected, err := selectNodes(root, specBcks)
 	if err != nil {
 		return nil, err
 	}
 
-	tplData, err := makeTplData(pkg, outPkg, args.Tags, selected, specBcks, transBcks)
+	tplData, err := makeTplData(pkg, outPkg, args.Tags, selected, specBcks)
 	if err != nil {
 		return nil, err
 	}
@@ -82,11 +82,18 @@ func Generate(ctx context.Context, args Args) (*Result, error) {
 
 	logf(args, " done (%v)\n", time.Since(t0).Truncate(time.Microsecond))
 
+	if len(selected.UnselectedTypes) > 0 {
+		logf(args, "%d unresolved dependency added to MakeBackends function\n", len(selected.UnselectedTypes))
+		for _, t := range selected.UnselectedTypes {
+			logf(args, "  - %s\n", t.String())
+		}
+	}
+
 	return &Result{
 		Root:           root,
 		SpecBackends:   specBcks,
-		SelectedNodes:  selected,
-		TransBackends:  transBcks,
+		SelectedNodes:  selected.SelectedNodes,
+		TransBackends:  selected.TransitiveBackends,
 		TplData:        tplData,
 		WeldOutput:     weldOut,
 		BackendsOutput: bcksOut,
@@ -115,19 +122,31 @@ func union(b Backends, bl []Backends) []BackendsDep {
 	return res
 }
 
+type NodeSelection struct {
+	// SelectedNodes is all the functions that need to be called in order
+	// to create the weld state
+	SelectedNodes []Node
+	// TransitiveBackends is the other backends that needed to be satisfied by required nodes
+	TransitiveBackends []Backends
+	// UnselectedTypes is a list of parameters that could not be satisfied by dependencies
+	UnselectedTypes []types.Type
+}
+
 // selectNodes returns the nodes required by the backends as well as
 // any transitive backends found.
-func selectNodes(root *Node, bcks Backends) ([]Node, []Backends, error) {
-	var res []Node
+func selectNodes(root *Node, bcks Backends) (NodeSelection, error) {
+	var ret NodeSelection
 	selector := NewSelector(bcks)
+
 	for !selector.Empty() {
 		dep := selector.Pop()
 
 		selectResult, ok, err := selectNode(root, dep)
 		if err != nil {
-			return nil, nil, err
+			return NodeSelection{}, err
 		} else if !ok {
-			return nil, nil, errors.New("dependency not found in provider graph", j.MKV{"dep": dep})
+			ret.UnselectedTypes = append(ret.UnselectedTypes, dep)
+			continue
 		}
 
 		// If the selected node binds an implementation, add it.
@@ -145,7 +164,7 @@ func selectNodes(root *Node, bcks Backends) ([]Node, []Backends, error) {
 					if isBackends(p.Type()) {
 						b, err := newBackends(p.Type(), selectResult.Node.FuncObj)
 						if err != nil {
-							return nil, nil, err
+							return NodeSelection{}, err
 						}
 						selector.AddBackends(b, true)
 						continue
@@ -155,9 +174,14 @@ func selectNodes(root *Node, bcks Backends) ([]Node, []Backends, error) {
 			}
 		}
 
-		res = append(res, *selectResult.Node)
+		ret.SelectedNodes = append(ret.SelectedNodes, *selectResult.Node)
 	}
-	return res, selector.GetBackends(), nil
+	ret.TransitiveBackends = selector.GetBackends()
+	sort.Slice(ret.UnselectedTypes, func(i, j int) bool {
+		tI, tJ := ret.UnselectedTypes[i], ret.UnselectedTypes[j]
+		return len(tI.String()) < len(tJ.String())
+	})
+	return ret, nil
 }
 
 func selectNode(node *Node, dep types.Type) (SelectResult, bool, error) {
@@ -490,7 +514,7 @@ func findSpecParams(pkg *packages.Package) (ast.Expr, ast.Expr, error) {
 // is deterministic.
 //
 // TODO(neil): Optimise this. It's a little messy, and makes two copies of deps.
-func sortInDependencyOrder(deps []BackendsDep, nodes []Node) error {
+func sortInDependencyOrder(deps []BackendsDep, nodes []Node, paramTypes []types.Type) error {
 	// Sort alphabetically first. We'll rearrange if there are dependencies, but
 	// this is the ordering we start with.
 	sort.Slice(deps, func(i, j int) bool {
@@ -510,6 +534,9 @@ func sortInDependencyOrder(deps []BackendsDep, nodes []Node) error {
 		i         = 0
 		target    = len(deps)
 	)
+	for _, t := range paramTypes {
+		resultMap[t.String()] = true
+	}
 	for len(q) > 0 {
 		i++
 		if i > target {

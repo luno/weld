@@ -93,12 +93,12 @@ func maybeExecBackendsTpl(tplData *TplData, bcks Backends, genBcks bool) ([]byte
 }
 
 // makeTplData returns the template data for backends and selected nodes.
-func makeTplData(in, out *packages.Package, tags string, nodes []Node, specBcks Backends, transBcks []Backends) (*TplData, error) {
+func makeTplData(in, out *packages.Package, tags string, selected NodeSelection, specBcks Backends) (*TplData, error) {
 	pkgCache := NewPkgCache(in, out)
 	pkgCache.Add(specBcks.Package)
 
-	unionDeps := union(specBcks, transBcks)
-	err := sortInDependencyOrder(unionDeps, nodes)
+	unionDeps := union(specBcks, selected.TransitiveBackends)
+	err := sortInDependencyOrder(unionDeps, selected.SelectedNodes, selected.UnselectedTypes)
 	if err != nil {
 		return nil, errors.Wrap(err, "error sorting in dependency order")
 	}
@@ -111,7 +111,14 @@ func makeTplData(in, out *packages.Package, tags string, nodes []Node, specBcks 
 	// This is needed to correctly construct transitive dependencies.
 	varMap := make(map[string]string)
 	for _, dep := range unionDeps {
-		varMap[dep.Type.String()] = getter2Var(dep.Getter)
+		varMap[dep.Type.String()] = "b." + getter2Var(dep.Getter)
+	}
+	for _, param := range selected.UnselectedTypes {
+		v, err := type2Param(param)
+		if err != nil {
+			return nil, err
+		}
+		varMap[param.String()] = v
 	}
 
 	var deps []TplDep
@@ -127,7 +134,7 @@ func makeTplData(in, out *packages.Package, tags string, nodes []Node, specBcks 
 	// avoid conflicts.
 	uniqVars := make(map[string]string)
 	for _, dep := range unionDeps {
-		d, err := makeTplDep(pkgCache, nodes, dep.Getter, dep.Type, varMap)
+		d, err := makeTplDep(pkgCache, selected.SelectedNodes, dep.Getter, dep.Type, varMap)
 		if err != nil {
 			return nil, err
 		}
@@ -151,12 +158,17 @@ func makeTplData(in, out *packages.Package, tags string, nodes []Node, specBcks 
 		deps = append(deps, *d)
 	}
 
-	tb, err := makeTplBcks(pkgCache, transBcks)
+	tb, err := makeTplBcks(pkgCache, selected.TransitiveBackends)
 	if err != nil {
 		return nil, err
 	}
 
 	bcksTypeRef, err := makeTypeRef(pkgCache, specBcks.Type)
+	if err != nil {
+		return nil, err
+	}
+
+	params, err := makeParams(pkgCache, selected.UnselectedTypes)
 	if err != nil {
 		return nil, err
 	}
@@ -167,6 +179,7 @@ func makeTplData(in, out *packages.Package, tags string, nodes []Node, specBcks 
 		BackendsName: specBcks.Name,
 		BackendsType: bcksTypeRef,
 		Imports:      pkgCache.Pkgs,
+		Params:       params,
 		Deps:         deps,
 		TransBcks:    tb,
 	}, nil
@@ -287,6 +300,24 @@ func makeTypeRef(pkgCache *PkgCache, typ types.Type) (string, error) {
 	return res, nil
 }
 
+func makeParams(pkgCache *PkgCache, unselected []types.Type) ([]TplParam, error) {
+	var params []TplParam
+	for _, p := range unselected {
+		v, err := type2Param(p)
+		if err != nil {
+			return nil, err
+		}
+		t, err := makeTypeRef(pkgCache, p)
+		if err != nil {
+			return nil, err
+		}
+		params = append(params, TplParam{
+			Name: v, Type: t,
+		})
+	}
+	return params, nil
+}
+
 // takesBcks returns true if the function signature takes a Backends as parameter.
 func takesBcks(sig *types.Signature) bool {
 	for _, p := range tupleSlice(sig.Params()) {
@@ -345,6 +376,18 @@ func getter2Var(getter string) string {
 	chars := []rune(getter)
 	chars[0] = unicode.ToLower(chars[0])
 	return string(chars)
+}
+
+func type2Param(t types.Type) (string, error) {
+	if point, ok := t.(*types.Pointer); ok {
+		return type2Param(point.Elem())
+	}
+
+	named, ok := t.(*types.Named)
+	if !ok {
+		return "", errors.New("cannot construct param var with unnamed parameter type", j.KV("param_type", t.String()))
+	}
+	return strings.ToLower(named.Obj().Name()), nil
 }
 
 // smartAlias returns a "unique" import alias for a package as slice of path sections.
@@ -531,7 +574,7 @@ func getParams(typ *types.Signature, varMap map[string]string) (params []string,
 				"sig":        typ.String(),
 			})
 		}
-		params = append(params, "b."+v)
+		params = append(params, v)
 	}
 	return params, nil
 }

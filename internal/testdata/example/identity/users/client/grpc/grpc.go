@@ -2,9 +2,10 @@ package grpc
 
 import (
 	"context"
+	"flag"
+
 	"example/identity/users"
 	pb "example/identity/users/userspb"
-	"flag"
 
 	"google.golang.org/grpc"
 

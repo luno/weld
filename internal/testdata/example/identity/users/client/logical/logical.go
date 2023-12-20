@@ -2,6 +2,7 @@ package logical
 
 import (
 	"context"
+
 	"example/identity/users"
 	"example/identity/users/ops"
 

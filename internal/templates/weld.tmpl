@@ -12,7 +12,7 @@ import (
 {{end}}
 )
 
-func Make{{.BackendsName}}() ({{.BackendsType}}, error) {
+func Make{{.BackendsName}}({{.ParamsString}}) ({{.BackendsType}}, error) {
 	var (
 		b backendsImpl{{if .DepsReturnErr}}
 		err error{{end}}

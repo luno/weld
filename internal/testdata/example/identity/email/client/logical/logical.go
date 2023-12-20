@@ -2,6 +2,7 @@ package logical
 
 import (
 	"context"
+
 	"example/identity/email"
 	"example/identity/email/ops"
 

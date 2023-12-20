@@ -1,0 +1,2 @@
+Func[1]: func example/param/state.MakeFizz(context.Context) (example/param/state.Fizz, error)
+Func[1]: func example/param/state.MakeFoo(b example/param/state.Bar) example/param/state.Foo

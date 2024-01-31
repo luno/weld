@@ -139,13 +139,16 @@ func TestGenerate(t *testing.T) {
 			_ = os.Remove(targetWeldFile)
 			_ = os.Remove(targetBcksFile)
 
+			pkgs, err := load(context.Background(), targetDir, nil, ".")
+			jtest.RequireNil(t, err)
+			require.Len(t, pkgs, 1)
+
 			res, err := Generate(context.Background(), Args{
-				InDir:   targetDir,
-				OutDir:  targetDir,
 				Env:     nil,
 				Verbose: true,
+				Dir:     targetDir,
 				Tags:    test.Tags,
-			})
+			}, pkgs[0])
 			jtest.Require(t, nil, err)
 			require.Empty(t, res.Errors)
 

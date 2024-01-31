@@ -6,28 +6,23 @@ import (
 	"go/ast"
 	"go/token"
 	"go/types"
-	"strings"
 
 	"github.com/luno/jettison/errors"
+	"github.com/luno/jettison/j"
 	"golang.org/x/tools/go/ast/astutil"
 	"golang.org/x/tools/go/packages"
 )
 
-// load typechecks the packages that match the given patterns and
-// includes source for all transitive dependencies. The patterns are
-// defined by the underlying build system. For the go tool, this is
-// described at https://golang.org/cmd/go/#hdr-Package_lists_and_patterns
+// load typechecks the given packages and all transitive dependencies.
 //
 // wd is the working directory and env is the set of environment
-// variables to use when loading the packages specified by patterns. If
-// env is nil or empty, it is interpreted as an empty set of variables.
-// In case of duplicate environment variables, the last one in the list
-// takes precedence.
-//
-// Note this was copied from: github.com/google/wire@v0.4.0/internal/wire/parse.go
-func load(ctx context.Context, wd string, env []string, pattern string) (*packages.Package, error) {
+// variables to use when loading the specified packages. If env is nil
+// or empty, it is interpreted as an empty set of variables. In case of
+// duplicate environment variables, the last one in the list takes precedence.
+func load(ctx context.Context, wd string, env []string, pkgs ...string) ([]*packages.Package, error) {
 	mode := packages.NeedSyntax | packages.NeedImports | packages.NeedTypes |
-		packages.NeedTypesInfo | packages.NeedDeps | packages.NeedName
+		packages.NeedTypesInfo | packages.NeedDeps | packages.NeedName |
+		packages.NeedModule
 	cfg := &packages.Config{
 		Context:    ctx,
 		Mode:       mode,
@@ -36,26 +31,17 @@ func load(ctx context.Context, wd string, env []string, pattern string) (*packag
 		BuildFlags: []string{"-tags=weld"},
 	}
 
-	pkgs, err := packages.Load(cfg, "pattern="+pattern)
+	loadedPackages, err := packages.Load(cfg, pkgs...)
 	if err != nil {
 		return nil, err
-	} else if len(pkgs) != 1 {
-		return nil, errors.New("unexpected number of packages")
+	} else if len(loadedPackages) != len(pkgs) {
+		return nil, errors.New("unexpected number of packages loaded", j.MKV{
+			"want": len(pkgs),
+			"got":  len(loadedPackages),
+		})
 	}
 
-	pkg := pkgs[0]
-	// Since we clear function bodies, filter "imported but not used" errors.
-	var el []packages.Error
-	for _, e := range pkg.Errors {
-		if strings.Contains(e.Msg, "imported but not used") {
-			continue
-		}
-		el = append(el, e)
-	}
-
-	pkg.Errors = el
-
-	return pkg, nil
+	return loadedPackages, nil
 }
 
 // varDecl finds the declaration that defines the given variable.

@@ -10,22 +10,23 @@ import (
 )
 
 type Args struct {
-	InDir   string
-	OutDir  string
+	Dir     string
 	Env     []string
 	Verbose bool
+	Pkgs    []string
 	Tags    string
 }
 
 type Result struct {
-	Root           *Node
-	SpecBackends   Backends
-	TransBackends  []Backends
-	SelectedNodes  []Node
-	Errors         []error
-	TplData        *TplData
-	WeldOutput     []byte
-	BackendsOutput []byte
+	Root            *Node
+	SpecBackends    Backends
+	TransBackends   []Backends
+	SelectedNodes   []Node
+	UnselectedTypes []types.Type
+	Errors          []error
+	TplData         *TplData
+	WeldOutput      []byte
+	BackendsOutput  []byte
 }
 
 //go:generate stringer -type=NodeType -trimprefix=NodeType

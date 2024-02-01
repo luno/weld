@@ -318,6 +318,23 @@ func makeParams(pkgCache *PkgCache, unselected []types.Type) ([]TplParam, error)
 	return params, nil
 }
 
+// takesBcks returns true if the function signature takes a Backends as parameter.
+func takesBcks(sig *types.Signature) bool {
+	for _, p := range tupleSlice(sig.Params()) {
+		n, ok := p.Type().(*types.Named)
+		if !ok {
+			continue
+		}
+		if _, ok := n.Underlying().(*types.Interface); !ok {
+			continue
+		}
+		if strings.HasSuffix(n.String(), "Backends") {
+			return true
+		}
+	}
+	return false
+}
+
 // returnsErr returns true if the function signature returns an error.
 func returnsErr(sig *types.Signature) bool {
 	for _, r := range tupleSlice(sig.Results()) {

@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -31,7 +32,10 @@ func RemoveGenFiles(workDir string) error {
 }
 
 // WriteGenFiles outputs the results from Generate to *_gen.go files.
-func WriteGenFiles(res *Result, workDir string) error {
+func WriteGenFiles(res *Result, workDir string, verbose bool) error {
+	if verbose {
+		fmt.Println("Writing", weldGenFileName)
+	}
 	target := filepath.Join(workDir, weldGenFileName)
 	err := ioutil.WriteFile(target, res.WeldOutput, 0o644)
 	if err != nil {
@@ -42,6 +46,9 @@ func WriteGenFiles(res *Result, workDir string) error {
 		return nil
 	}
 
+	if verbose {
+		fmt.Println("Writing", backendsGenFileName)
+	}
 	target = filepath.Join(workDir, backendsGenFileName)
 	return ioutil.WriteFile(target, res.BackendsOutput, 0o644)
 }

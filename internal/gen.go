@@ -6,7 +6,6 @@ import (
 	"go/ast"
 	"go/token"
 	"go/types"
-	"path/filepath"
 	"reflect"
 	"sort"
 	"strings"
@@ -17,62 +16,34 @@ import (
 	"golang.org/x/tools/go/packages"
 )
 
-// Run runs weld with the given arguments.
-func Run(ctx context.Context, args Args) error {
-	if len(args.Pkgs) == 0 {
-		return nil
-	}
-
-	logf(args, "🌲 Loading AST...")
+func Generate(ctx context.Context, args Args) (*Result, error) {
+	logf(args, "Generating state for %s\n", args.InDir)
+	logf(args, "Loading ast...")
 	t0 := time.Now()
-	loadedPackages, err := load(ctx, args.Dir, args.Env, args.Pkgs...)
+
+	pkg, err := load(ctx, args.InDir, args.Env, ".")
 	if err != nil {
-		logf(args, " error!\n")
-		return err
-	}
-	logf(args, " (%v)\n", timeSince(t0))
-
-	for _, pkg := range loadedPackages {
-		logf(args, "🧑‍🏭 %s...", pkg.PkgPath)
-
-		if len(pkg.Errors) > 0 {
-			logf(args, "\n❗️ %v\n", pkg.Errors[0])
-			continue
+		return nil, err
+	} else if len(pkg.Errors) > 0 {
+		var res Result
+		for _, e := range pkg.Errors {
+			res.Errors = append(res.Errors, e)
 		}
+		return &res, nil
+	}
 
-		t0 := time.Now()
-		res, err := Generate(ctx, args, pkg)
+	outPkg := pkg
+	if args.InDir != args.OutDir {
+		outPkg, err = load(ctx, args.OutDir, args.Env, ".")
 		if err != nil {
-			// NoReturnErr: Try the next package.
-			logf(args, "\n❗️ %v\n", err)
-			continue
-		}
-		if err := Write(ctx, args, pkg, res); err != nil {
-			// NoReturnErr: Try the next package.
-			logf(args, "\n❗️ %v\n", err)
-			continue
-		}
-		logf(args, " (%v)\n", timeSince(t0))
-
-		if len(res.UnselectedTypes) > 0 {
-			logf(args, "   Unresolved dependencies added to MakeBackends:\n")
-			for _, t := range res.UnselectedTypes {
-				logf(args, "     - %s\n", t)
-			}
+			return nil, err
 		}
 	}
 
-	return nil
-}
-
-func timeSince(t0 time.Time) time.Duration {
-	return time.Since(t0).Truncate(time.Millisecond)
-}
-
-// Generate runs weld on the given package.
-// It returns a Result struct with the generated code.
-func Generate(ctx context.Context, args Args, pkg *packages.Package) (*Result, error) {
+	logf(args, " done (%v)\n", time.Since(t0).Truncate(time.Millisecond))
 	setPos(pkg) // Globals oh no :(
+	logf(args, "Welding dependencies...")
+	t0 = time.Now()
 
 	graphExpr, bckExpr, err := findSpecParams(pkg)
 	if err != nil {
@@ -94,7 +65,7 @@ func Generate(ctx context.Context, args Args, pkg *packages.Package) (*Result, e
 		return nil, err
 	}
 
-	tplData, err := makeTplData(pkg, pkg, args.Tags, selected, specBcks)
+	tplData, err := makeTplData(pkg, outPkg, args.Tags, selected, specBcks)
 	if err != nil {
 		return nil, err
 	}
@@ -109,30 +80,24 @@ func Generate(ctx context.Context, args Args, pkg *packages.Package) (*Result, e
 		return nil, err
 	}
 
-	return &Result{
-		Root:            root,
-		SpecBackends:    specBcks,
-		SelectedNodes:   selected.SelectedNodes,
-		TransBackends:   selected.TransitiveBackends,
-		UnselectedTypes: selected.UnselectedTypes,
-		TplData:         tplData,
-		WeldOutput:      weldOut,
-		BackendsOutput:  bcksOut,
-	}, nil
-}
+	logf(args, " done (%v)\n", time.Since(t0).Truncate(time.Microsecond))
 
-// Write writes the weld result to disk.
-// It first removes existing files, and then writes the new files.
-func Write(ctx context.Context, args Args, pkg *packages.Package, result *Result) error {
-	pkgInMod := strings.TrimPrefix(pkg.PkgPath, pkg.Module.Path)
-	outDir := filepath.Join(pkg.Module.Dir, pkgInMod)
-	if err := RemoveGenFiles(outDir); err != nil {
-		return err
+	if len(selected.UnselectedTypes) > 0 {
+		logf(args, "%d unresolved dependency added to MakeBackends function\n", len(selected.UnselectedTypes))
+		for _, t := range selected.UnselectedTypes {
+			logf(args, "  - %s\n", t.String())
+		}
 	}
-	if err := WriteGenFiles(result, outDir); err != nil {
-		return err
-	}
-	return nil
+
+	return &Result{
+		Root:           root,
+		SpecBackends:   specBcks,
+		SelectedNodes:  selected.SelectedNodes,
+		TransBackends:  selected.TransitiveBackends,
+		TplData:        tplData,
+		WeldOutput:     weldOut,
+		BackendsOutput: bcksOut,
+	}, nil
 }
 
 func union(b Backends, bl []Backends) []BackendsDep {

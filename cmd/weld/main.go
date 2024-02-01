@@ -9,11 +9,16 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
+
+	"github.com/luno/jettison/errors"
 
 	"github.com/luno/weld/internal"
 )
 
 var (
+	in      = flag.String("in", "", "Path to package with weld spec (default current path)")
+	out     = flag.String("out", "", "Path to write output to (default is value of -in)")
 	verbose = flag.Bool("verbose", false, "Be verbose")
 	tags    = flag.String("tags", "", "Build tags to include in generated file")
 )
@@ -24,35 +29,67 @@ func fatal(err error) {
 }
 
 func getArgs() (internal.Args, error) {
-	wd, err := os.Getwd()
-	if err != nil {
-		return internal.Args{}, err
+	var err error
+	var inDir string
+	if *in != "" {
+		inDir, err = filepath.Abs(*in)
+		if err != nil {
+			return internal.Args{}, err
+		}
+	} else {
+		inDir, err = os.Getwd()
+		if err != nil {
+			return internal.Args{}, err
+		}
 	}
 
-	pkgs := flag.Args()
-	if len(pkgs) == 0 {
-		pkgs = []string{"."}
+	outDir := inDir
+	if *out != "" {
+		outDir, err = filepath.Abs(*out)
+		if err != nil {
+			return internal.Args{}, err
+		}
 	}
 
 	return internal.Args{
-		Dir:     wd,
+		InDir:   inDir,
+		OutDir:  outDir,
 		Env:     os.Environ(),
 		Verbose: *verbose,
-		Pkgs:    pkgs,
 		Tags:    *tags,
 	}, nil
 }
 
 func main() {
-	flag.Usage = func() { fmt.Println("Usage: weld [-verbose] pkgs...") }
 	flag.Parse()
 
 	args, err := getArgs()
 	if err != nil {
+		// NoReturnErr: fatal
 		fatal(err)
 	}
 
-	if err := internal.Run(context.Background(), args); err != nil {
+	if err := run(context.Background(), args); err != nil {
+		// NoReturnErr: fatal
 		fatal(err)
 	}
+}
+
+func run(ctx context.Context, args internal.Args) error {
+	err := internal.RemoveGenFiles(args.OutDir)
+	if err != nil {
+		return err
+	}
+
+	res, err := internal.Generate(ctx, args)
+	if err != nil {
+		return err
+	} else if len(res.Errors) > 0 {
+		for _, e := range res.Errors {
+			fmt.Printf("%+v\n", e)
+		}
+		return errors.New("generate error")
+	}
+
+	return internal.WriteGenFiles(res, args.OutDir, args.Verbose)
 }

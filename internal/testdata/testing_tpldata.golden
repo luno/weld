@@ -1,0 +1,18 @@
+package: state
+tags: ""
+backendstype: Backends
+backendsname: Backends
+imports: {}
+params: []
+deps:
+- type: Foo
+  var: foo
+  getter: GetFoo
+  isduplicate: false
+  provider:
+    funcpkg: ""
+    funcname: MakeFoo
+    returnserr: false
+    params: []
+    errwrapmsg: testing state make foo
+transbcks: []

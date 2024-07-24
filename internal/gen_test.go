@@ -70,9 +70,10 @@ func TestMain(m *testing.M) {
 
 func TestGenerate(t *testing.T) {
 	tests := []struct {
-		Name    string
-		WorkDir string
-		Tags    string
+		Name       string
+		WorkDir    string
+		Tags       string
+		ForTesting bool
 	}{
 		{
 			Name:    "identity",
@@ -124,6 +125,11 @@ func TestGenerate(t *testing.T) {
 			Name:    "parameters",
 			WorkDir: "example/param/state",
 		},
+		{
+			Name:       "testing",
+			WorkDir:    "example/testing/state",
+			ForTesting: true,
+		},
 	}
 
 	for _, test := range tests {
@@ -140,11 +146,12 @@ func TestGenerate(t *testing.T) {
 			_ = os.Remove(targetBcksFile)
 
 			res, err := Generate(context.Background(), Args{
-				InDir:   targetDir,
-				OutDir:  targetDir,
-				Env:     nil,
-				Verbose: true,
-				Tags:    test.Tags,
+				InDir:      targetDir,
+				OutDir:     targetDir,
+				Env:        nil,
+				Verbose:    true,
+				Tags:       test.Tags,
+				ForTesting: test.ForTesting,
 			})
 			jtest.Require(t, nil, err)
 			require.Empty(t, res.Errors)

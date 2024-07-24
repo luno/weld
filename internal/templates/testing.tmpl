@@ -1,0 +1,11 @@
+{{range .Deps }}
+// Set{{.Getter}}ForTesting is a runtime available override for the "{{.Var}}" dependency that should only be used for testing.
+func (b *backendsImpl) Set{{.Getter}}ForTesting(t *testing.T, {{.Var}} {{.Type}}) {
+    old := b.{{.Var}}
+    t.Cleanup(func() {
+   		b.{{.Var}} = old
+   	})
+
+   	b.{{.Var}} = {{.Var}}
+}
+{{end}}

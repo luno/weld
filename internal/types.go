@@ -10,11 +10,12 @@ import (
 )
 
 type Args struct {
-	InDir   string
-	OutDir  string
-	Env     []string
-	Verbose bool
-	Tags    string
+	InDir      string
+	OutDir     string
+	Env        []string
+	Verbose    bool
+	Tags       string
+	ForTesting bool
 }
 
 type Result struct {

@@ -142,8 +142,10 @@ func TestGenerate(t *testing.T) {
 			targetDir := filepath.Join(wd, "testdata", test.WorkDir)
 			targetWeldFile := filepath.Join(targetDir, "weld_gen.go")
 			targetBcksFile := filepath.Join(targetDir, "backends_gen.go")
+			targetTestingFile := filepath.Join(targetDir, "testing_gen.go")
 			_ = os.Remove(targetWeldFile)
 			_ = os.Remove(targetBcksFile)
+			_ = os.Remove(targetTestingFile)
 
 			res, err := Generate(context.Background(), Args{
 				InDir:      targetDir,
@@ -182,9 +184,15 @@ func TestGenerate(t *testing.T) {
 
 			g.Assert(t, test.Name+"_"+"weldoutput", res.WeldOutput)
 			g.Assert(t, test.Name+"_"+"bcksoutput", res.BackendsOutput)
+			g.Assert(t, test.Name+"_"+"testingoutput", res.TestingOutput)
 
 			err = os.WriteFile(targetWeldFile, res.WeldOutput, 0o644)
 			require.NoError(t, err)
+
+			if len(res.TestingOutput) > 0 {
+				err = os.WriteFile(targetTestingFile, res.TestingOutput, 0o644)
+				require.NoError(t, err)
+			}
 
 			if len(res.BackendsOutput) > 0 {
 				err = os.WriteFile(targetBcksFile, res.BackendsOutput, 0o644)

@@ -25,25 +25,16 @@ var bcksTplText string
 //go:embed templates/testing.tmpl
 var testingTplText string
 
-//go:embed templates/testingbcks.tmpl
-var testingbcksTplText string
-
 var (
-	weldTpl        = template.Must(template.New("").Parse(weldTplText))
-	bcksTpl        = template.Must(template.New("").Parse(bcksTplText))
-	testingTpl     = template.Must(template.New("").Parse(weldTplText + testingTplText))
-	testingbcksTpl = template.Must(template.New("").Parse(testingbcksTplText))
+	weldTpl    = template.Must(template.New("").Parse(weldTplText))
+	bcksTpl    = template.Must(template.New("").Parse(bcksTplText))
+	testingTpl = template.Must(template.New("").Parse(testingTplText))
 )
 
 // execWeldTpl returns the generated source of the template data.
-func execWeldTpl(data *TplData, forTesting bool) ([]byte, error) {
-	defaultTmpl := weldTpl
-	if forTesting {
-		defaultTmpl = testingTpl
-	}
-
+func execWeldTpl(data *TplData) ([]byte, error) {
 	var buf bytes.Buffer
-	err := defaultTmpl.Execute(&buf, data)
+	err := weldTpl.Execute(&buf, data)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +53,28 @@ func execWeldTpl(data *TplData, forTesting bool) ([]byte, error) {
 	return src, nil
 }
 
-func maybeExecBackendsTpl(tplData *TplData, bcks Backends, genBcks, forTesting bool) ([]byte, error) {
+func execTestingTpl(data *TplData) ([]byte, error) {
+	var buf bytes.Buffer
+	err := testingTpl.Execute(&buf, data)
+	if err != nil {
+		return nil, err
+	}
+
+	imports.LocalPrefix = "bitx"
+	src, err := imports.Process("testing_gen.go", buf.Bytes(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	src, err = format.Source(src)
+	if err != nil {
+		return nil, err
+	}
+
+	return src, nil
+}
+
+func maybeExecBackendsTpl(tplData *TplData, bcks Backends, genBcks bool) ([]byte, error) {
 	if !genBcks {
 		return nil, nil
 	}
@@ -85,13 +97,8 @@ func maybeExecBackendsTpl(tplData *TplData, bcks Backends, genBcks, forTesting b
 	clone := *tplData
 	clone.Deps = deps
 
-	defaultTmpl := bcksTpl
-	if forTesting {
-		defaultTmpl = testingbcksTpl
-	}
-
 	var buf bytes.Buffer
-	err := defaultTmpl.Execute(&buf, clone)
+	err := bcksTpl.Execute(&buf, clone)
 	if err != nil {
 		return nil, err
 	}

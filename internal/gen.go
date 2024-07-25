@@ -70,12 +70,20 @@ func Generate(ctx context.Context, args Args) (*Result, error) {
 		return nil, err
 	}
 
-	weldOut, err := execWeldTpl(tplData, args.ForTesting)
+	weldOut, err := execWeldTpl(tplData)
 	if err != nil {
 		return nil, err
 	}
 
-	bcksOut, err := maybeExecBackendsTpl(tplData, specBcks, genBcks, args.ForTesting)
+	var testingOut []byte
+	if args.ForTesting {
+		testingOut, err = execTestingTpl(tplData)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	bcksOut, err := maybeExecBackendsTpl(tplData, specBcks, genBcks)
 	if err != nil {
 		return nil, err
 	}
@@ -97,6 +105,7 @@ func Generate(ctx context.Context, args Args) (*Result, error) {
 		TplData:        tplData,
 		WeldOutput:     weldOut,
 		BackendsOutput: bcksOut,
+		TestingOutput:  testingOut,
 	}, nil
 }
 

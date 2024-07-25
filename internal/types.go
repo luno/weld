@@ -27,6 +27,7 @@ type Result struct {
 	TplData        *TplData
 	WeldOutput     []byte
 	BackendsOutput []byte
+	TestingOutput  []byte
 }
 
 //go:generate stringer -type=NodeType -trimprefix=NodeType

@@ -70,9 +70,10 @@ func TestMain(m *testing.M) {
 
 func TestGenerate(t *testing.T) {
 	tests := []struct {
-		Name    string
-		WorkDir string
-		Tags    string
+		Name       string
+		WorkDir    string
+		Tags       string
+		ForTesting bool
 	}{
 		{
 			Name:    "identity",
@@ -124,6 +125,11 @@ func TestGenerate(t *testing.T) {
 			Name:    "parameters",
 			WorkDir: "example/param/state",
 		},
+		{
+			Name:       "testing",
+			WorkDir:    "example/testing/state",
+			ForTesting: true,
+		},
 	}
 
 	for _, test := range tests {
@@ -136,15 +142,18 @@ func TestGenerate(t *testing.T) {
 			targetDir := filepath.Join(wd, "testdata", test.WorkDir)
 			targetWeldFile := filepath.Join(targetDir, "weld_gen.go")
 			targetBcksFile := filepath.Join(targetDir, "backends_gen.go")
+			targetTestingFile := filepath.Join(targetDir, "testing_gen.go")
 			_ = os.Remove(targetWeldFile)
 			_ = os.Remove(targetBcksFile)
+			_ = os.Remove(targetTestingFile)
 
 			res, err := Generate(context.Background(), Args{
-				InDir:   targetDir,
-				OutDir:  targetDir,
-				Env:     nil,
-				Verbose: true,
-				Tags:    test.Tags,
+				InDir:      targetDir,
+				OutDir:     targetDir,
+				Env:        nil,
+				Verbose:    true,
+				Tags:       test.Tags,
+				ForTesting: test.ForTesting,
 			})
 			jtest.Require(t, nil, err)
 			require.Empty(t, res.Errors)
@@ -175,9 +184,15 @@ func TestGenerate(t *testing.T) {
 
 			g.Assert(t, test.Name+"_"+"weldoutput", res.WeldOutput)
 			g.Assert(t, test.Name+"_"+"bcksoutput", res.BackendsOutput)
+			g.Assert(t, test.Name+"_"+"testingoutput", res.TestingOutput)
 
 			err = os.WriteFile(targetWeldFile, res.WeldOutput, 0o644)
 			require.NoError(t, err)
+
+			if len(res.TestingOutput) > 0 {
+				err = os.WriteFile(targetTestingFile, res.TestingOutput, 0o644)
+				require.NoError(t, err)
+			}
 
 			if len(res.BackendsOutput) > 0 {
 				err = os.WriteFile(targetBcksFile, res.BackendsOutput, 0o644)

@@ -21,6 +21,7 @@ var (
 	out     = flag.String("out", "", "Path to write output to (default is value of -in)")
 	verbose = flag.Bool("verbose", false, "Be verbose")
 	tags    = flag.String("tags", "", "Build tags to include in generated file")
+	testing = flag.Bool("testing", false, "Generate the testing variant that allows for test case dependency management")
 )
 
 func fatal(err error) {
@@ -52,11 +53,12 @@ func getArgs() (internal.Args, error) {
 	}
 
 	return internal.Args{
-		InDir:   inDir,
-		OutDir:  outDir,
-		Env:     os.Environ(),
-		Verbose: *verbose,
-		Tags:    *tags,
+		InDir:      inDir,
+		OutDir:     outDir,
+		Env:        os.Environ(),
+		Verbose:    *verbose,
+		Tags:       *tags,
+		ForTesting: *testing,
 	}, nil
 }
 

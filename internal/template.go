@@ -22,9 +22,13 @@ var weldTplText string
 //go:embed templates/bcks.tmpl
 var bcksTplText string
 
+//go:embed templates/testing.tmpl
+var testingTplText string
+
 var (
-	weldTpl = template.Must(template.New("").Parse(weldTplText))
-	bcksTpl = template.Must(template.New("").Parse(bcksTplText))
+	weldTpl    = template.Must(template.New("").Parse(weldTplText))
+	bcksTpl    = template.Must(template.New("").Parse(bcksTplText))
+	testingTpl = template.Must(template.New("").Parse(testingTplText))
 )
 
 // execWeldTpl returns the generated source of the template data.
@@ -37,6 +41,27 @@ func execWeldTpl(data *TplData) ([]byte, error) {
 
 	imports.LocalPrefix = "bitx"
 	src, err := imports.Process("weld_gen.go", buf.Bytes(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	src, err = format.Source(src)
+	if err != nil {
+		return nil, err
+	}
+
+	return src, nil
+}
+
+func execTestingTpl(data *TplData) ([]byte, error) {
+	var buf bytes.Buffer
+	err := testingTpl.Execute(&buf, data)
+	if err != nil {
+		return nil, err
+	}
+
+	imports.LocalPrefix = "bitx"
+	src, err := imports.Process("testing_gen.go", buf.Bytes(), nil)
 	if err != nil {
 		return nil, err
 	}

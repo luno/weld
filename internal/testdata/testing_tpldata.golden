@@ -7,7 +7,7 @@ params: []
 deps:
 - type: Foo
   var: foo
-  getter: GetFoo
+  getter: Foo
   isduplicate: false
   provider:
     funcpkg: ""

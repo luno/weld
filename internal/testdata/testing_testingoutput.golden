@@ -16,16 +16,16 @@ type TestingBackends struct {
 	foo Foo
 }
 
-func (ti *TestingBackends) GetFoo() Foo {
+func (ti *TestingBackends) Foo() Foo {
 	if ti.foo != nil {
 		return ti.foo
 	}
 
-	return ti.Backends.GetFoo()
+	return ti.Backends.Foo()
 }
 
-// SetGetFooForTesting is a runtime available override for the "foo" dependency that should only be used for testing.
-func (ti *TestingBackends) SetGetFooForTesting(t *testing.T, foo Foo) {
+// SetFooForTesting is a runtime available override for the "foo" dependency that should only be used for testing.
+func (ti *TestingBackends) SetFooForTesting(t *testing.T, foo Foo) {
 	t.Cleanup(func() {
 		ti.foo = nil
 	})

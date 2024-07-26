@@ -13,7 +13,7 @@ var _ = weld.NewSpec(
 )
 
 type Backends interface {
-	GetFoo() Foo
+	Foo() Foo
 }
 
 type Foo struct{}

@@ -16,6 +16,6 @@ type backendsImpl struct {
 	foo Foo
 }
 
-func (b *backendsImpl) GetFoo() Foo {
+func (b *backendsImpl) Foo() Foo {
 	return b.foo
 }

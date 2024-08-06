@@ -77,7 +77,7 @@ func Generate(ctx context.Context, args Args) (*Result, error) {
 
 	var testingOut []byte
 	if args.ForTesting {
-		testingOut, err = execTestingTpl(tplData)
+		testingOut, err = execTestingTpl(tplData, specBcks)
 		if err != nil {
 			return nil, err
 		}

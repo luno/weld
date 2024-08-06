@@ -53,9 +53,12 @@ func execWeldTpl(data *TplData) ([]byte, error) {
 	return src, nil
 }
 
-func execTestingTpl(data *TplData) ([]byte, error) {
+func execTestingTpl(data *TplData, bcks Backends) ([]byte, error) {
+	clone := *data
+	clone.Deps = filterTransitiveDeps(data, bcks)
+
 	var buf bytes.Buffer
-	err := testingTpl.Execute(&buf, data)
+	err := testingTpl.Execute(&buf, clone)
 	if err != nil {
 		return nil, err
 	}
@@ -74,11 +77,7 @@ func execTestingTpl(data *TplData) ([]byte, error) {
 	return src, nil
 }
 
-func maybeExecBackendsTpl(tplData *TplData, bcks Backends, genBcks bool) ([]byte, error) {
-	if !genBcks {
-		return nil, nil
-	}
-
+func filterTransitiveDeps(tplData *TplData, bcks Backends) []TplDep {
 	// Remove transitive deps
 	var deps []TplDep
 	for _, dep := range tplData.Deps {
@@ -94,8 +93,16 @@ func maybeExecBackendsTpl(tplData *TplData, bcks Backends, genBcks bool) ([]byte
 		}
 	}
 
+	return deps
+}
+
+func maybeExecBackendsTpl(tplData *TplData, bcks Backends, genBcks bool) ([]byte, error) {
+	if !genBcks {
+		return nil, nil
+	}
+
 	clone := *tplData
-	clone.Deps = deps
+	clone.Deps = filterTransitiveDeps(tplData, bcks)
 
 	var buf bytes.Buffer
 	err := bcksTpl.Execute(&buf, clone)

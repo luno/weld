@@ -26,7 +26,7 @@ type Testing{{.BackendsName}} struct {
 {{end}}{{end}}
 }
 
-{{range .Deps}}
+{{range .Deps}}{{if not .IsDuplicate }}
 func (ti *Testing{{$.BackendsName}}) {{.Getter}}() {{.Type}} {
     if ti.{{.Var}} != nil {
        return ti.{{.Var}}
@@ -34,19 +34,9 @@ func (ti *Testing{{$.BackendsName}}) {{.Getter}}() {{.Type}} {
 
 	return ti.{{$.BackendsName}}.{{.Getter}}()
 }
-{{end}}
+{{end}}{{end}}
 
-{{if .TransBcks -}}
-// Transitive dependency interface assertions.
-var (
-{{range .TransBcks -}}
-	_ {{.}} = (*Testing{{$.BackendsName}})(nil)
-{{end}}
-)
-{{end}}
-
-
-{{range .Deps }}
+{{range .Deps }}{{if not .IsDuplicate }}
 // Set{{.Getter}}ForTesting is a runtime available override for the "{{.Var}}" dependency that should only be used for testing.
 func (ti *Testing{{$.BackendsName}}) Set{{.Getter}}ForTesting(t *testing.T, {{.Var}} {{.Type}}) {
     t.Cleanup(func() {
@@ -55,4 +45,4 @@ func (ti *Testing{{$.BackendsName}}) Set{{.Getter}}ForTesting(t *testing.T, {{.V
 
    	ti.{{.Var}} = {{.Var}}
 }
-{{end}}
+{{end}}{{end}}

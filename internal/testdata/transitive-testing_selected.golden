@@ -1,0 +1,4 @@
+Func[1]: func example/transitive/ops.NewBar(foo example/transitive/ops.Foo) example/transitive/ops.Bar
+Func[1]: func example/transitive/ops.NewBaz(bar example/transitive/ops.Bar, qux example/transitive/ops.Qux) example/transitive/ops.Baz
+Func[1]: func example/transitive/ops.NewFoo() (example/transitive/ops.Foo, error)
+Func[1]: func example/transitive/ops.NewQux() (example/transitive/ops.Qux, error)

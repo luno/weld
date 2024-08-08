@@ -166,20 +166,22 @@ func selectNodes(root *Node, bcks Backends) (NodeSelection, error) {
 		// If selected node is a function, see if it has transitive backends or dep params, add them.
 		if selectResult.Node.Type == NodeTypeFunc {
 			sig := selectResult.Node.FuncSig
-			if sig.Params().Len() == 1 && sig.Variadic() {
-				// Just add variadic-only dependencies as is, assume it's functional options.
-			} else {
-				for _, p := range tupleSlice(sig.Params()) {
-					if isBackends(p.Type()) {
-						b, err := newBackends(p.Type(), selectResult.Node.FuncObj)
-						if err != nil {
-							return NodeSelection{}, err
-						}
-						selector.AddBackends(b, true)
-						continue
-					}
-					selector.AddDep(p.Type())
+
+			for i, p := range tupleSlice(sig.Params()) {
+				isLast := sig.Params().Len()-1 == i
+				if isLast && sig.Variadic() {
+					continue
 				}
+
+				if isBackends(p.Type()) {
+					b, err := newBackends(p.Type(), selectResult.Node.FuncObj)
+					if err != nil {
+						return NodeSelection{}, err
+					}
+					selector.AddBackends(b, true)
+					continue
+				}
+				selector.AddDep(p.Type())
 			}
 		}
 

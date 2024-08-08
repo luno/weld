@@ -130,6 +130,10 @@ func TestGenerate(t *testing.T) {
 			WorkDir:    "example/testing/state",
 			ForTesting: true,
 		},
+		{
+			Name:    "variadic",
+			WorkDir: "example/variadic/state",
+		},
 	}
 
 	for _, test := range tests {

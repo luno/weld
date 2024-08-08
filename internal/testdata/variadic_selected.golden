@@ -1,0 +1,1 @@
+Func[1]: func example/variadic/ops.NewFooForTesting(t *testing.T, opts ...example/variadic/ops.Option) (example/variadic/ops.Foo, error)

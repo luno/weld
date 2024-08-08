@@ -586,7 +586,8 @@ func getParams(typ *types.Signature, varMap map[string]string) (params []string,
 			continue
 		}
 
-		if typ.Variadic() {
+		isLast := typ.Params().Len()-1 == i
+		if isLast && typ.Variadic() {
 			// TODO(neil): Variadic parameters are often used for options.
 			// We skip those for now.
 			continue

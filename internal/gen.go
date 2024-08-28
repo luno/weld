@@ -102,7 +102,7 @@ func Generate(ctx context.Context, args Args) (*Result, error) {
 		SpecBackends:   specBcks,
 		SelectedNodes:  selected.SelectedNodes,
 		TransBackends:  selected.TransitiveBackends,
-		TplData:        tplData,
+		TplData:        &tplData,
 		WeldOutput:     weldOut,
 		BackendsOutput: bcksOut,
 		TestingOutput:  testingOut,

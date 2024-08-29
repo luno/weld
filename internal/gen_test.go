@@ -134,6 +134,12 @@ func TestGenerate(t *testing.T) {
 			Name:    "variadic",
 			WorkDir: "example/variadic/state",
 		},
+		{
+			Name:       "transitive-testing",
+			WorkDir:    "example/transitive/state",
+			Tags:       "!dev",
+			ForTesting: true,
+		},
 	}
 
 	for _, test := range tests {

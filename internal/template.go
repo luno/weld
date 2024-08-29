@@ -32,7 +32,7 @@ var (
 )
 
 // execWeldTpl returns the generated source of the template data.
-func execWeldTpl(data *TplData) ([]byte, error) {
+func execWeldTpl(data TplData) ([]byte, error) {
 	var buf bytes.Buffer
 	err := weldTpl.Execute(&buf, data)
 	if err != nil {
@@ -53,7 +53,9 @@ func execWeldTpl(data *TplData) ([]byte, error) {
 	return src, nil
 }
 
-func execTestingTpl(data *TplData) ([]byte, error) {
+func execTestingTpl(data TplData, bcks Backends) ([]byte, error) {
+	data.Deps = filterTransitiveDeps(data, bcks)
+
 	var buf bytes.Buffer
 	err := testingTpl.Execute(&buf, data)
 	if err != nil {
@@ -74,11 +76,7 @@ func execTestingTpl(data *TplData) ([]byte, error) {
 	return src, nil
 }
 
-func maybeExecBackendsTpl(tplData *TplData, bcks Backends, genBcks bool) ([]byte, error) {
-	if !genBcks {
-		return nil, nil
-	}
-
+func filterTransitiveDeps(tplData TplData, bcks Backends) []TplDep {
 	// Remove transitive deps
 	var deps []TplDep
 	for _, dep := range tplData.Deps {
@@ -94,11 +92,18 @@ func maybeExecBackendsTpl(tplData *TplData, bcks Backends, genBcks bool) ([]byte
 		}
 	}
 
-	clone := *tplData
-	clone.Deps = deps
+	return deps
+}
+
+func maybeExecBackendsTpl(tplData TplData, bcks Backends, genBcks bool) ([]byte, error) {
+	if !genBcks {
+		return nil, nil
+	}
+
+	tplData.Deps = filterTransitiveDeps(tplData, bcks)
 
 	var buf bytes.Buffer
-	err := bcksTpl.Execute(&buf, clone)
+	err := bcksTpl.Execute(&buf, tplData)
 	if err != nil {
 		return nil, err
 	}
@@ -118,14 +123,14 @@ func maybeExecBackendsTpl(tplData *TplData, bcks Backends, genBcks bool) ([]byte
 }
 
 // makeTplData returns the template data for backends and selected nodes.
-func makeTplData(in, out *packages.Package, tags string, selected NodeSelection, specBcks Backends) (*TplData, error) {
+func makeTplData(in, out *packages.Package, tags string, selected NodeSelection, specBcks Backends) (TplData, error) {
 	pkgCache := NewPkgCache(in, out)
 	pkgCache.Add(specBcks.Package)
 
 	unionDeps := union(specBcks, selected.TransitiveBackends)
 	err := sortInDependencyOrder(unionDeps, selected.SelectedNodes, selected.UnselectedTypes)
 	if err != nil {
-		return nil, errors.Wrap(err, "error sorting in dependency order")
+		return TplData{}, errors.Wrap(err, "error sorting in dependency order")
 	}
 
 	// TODO(neil): The deps are now sorted mostly alphabetically, but also in
@@ -141,7 +146,7 @@ func makeTplData(in, out *packages.Package, tags string, selected NodeSelection,
 	for _, param := range selected.UnselectedTypes {
 		v, err := type2Param(param)
 		if err != nil {
-			return nil, err
+			return TplData{}, err
 		}
 		varMap[param.String()] = v
 	}
@@ -161,7 +166,7 @@ func makeTplData(in, out *packages.Package, tags string, selected NodeSelection,
 	for _, dep := range unionDeps {
 		d, err := makeTplDep(pkgCache, selected.SelectedNodes, dep.Getter, dep.Type, varMap)
 		if err != nil {
-			return nil, err
+			return TplData{}, err
 		}
 
 		orig := d.Var
@@ -185,20 +190,20 @@ func makeTplData(in, out *packages.Package, tags string, selected NodeSelection,
 
 	tb, err := makeTplBcks(pkgCache, selected.TransitiveBackends)
 	if err != nil {
-		return nil, err
+		return TplData{}, err
 	}
 
 	bcksTypeRef, err := makeTypeRef(pkgCache, specBcks.Type)
 	if err != nil {
-		return nil, err
+		return TplData{}, err
 	}
 
 	params, err := makeParams(pkgCache, selected.UnselectedTypes)
 	if err != nil {
-		return nil, err
+		return TplData{}, err
 	}
 
-	return &TplData{
+	return TplData{
 		Package:      out.Name,
 		Tags:         tags,
 		BackendsName: specBcks.Name,

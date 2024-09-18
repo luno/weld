@@ -3,27 +3,27 @@ tags: ""
 backendstype: Backends
 backendsname: Backends
 imports:
-  example/variadic/ops:
-    name: variadic_ops
-    pkgpath: example/variadic/ops
-    aliased: true
-  testing:
-    name: testing
-    pkgpath: testing
-    aliased: false
+    example/variadic/ops:
+        name: variadic_ops
+        pkgpath: example/variadic/ops
+        aliased: true
+    testing:
+        name: testing
+        pkgpath: testing
+        aliased: false
 params:
-- name: t
-  type: '*testing.T'
+    - name: t
+      type: '*testing.T'
 deps:
-- type: variadic_ops.Foo
-  var: foo
-  getter: Foo
-  isduplicate: false
-  provider:
-    funcpkg: variadic_ops
-    funcname: NewFooForTesting
-    returnserr: true
-    params:
-    - t
-    errwrapmsg: variadic ops new foo for testing
+    - type: variadic_ops.Foo
+      var: foo
+      getter: Foo
+      isduplicate: false
+      provider:
+        funcpkg: variadic_ops
+        funcname: NewFooForTesting
+        returnserr: true
+        params:
+            - t
+        errwrapmsg: variadic ops new foo for testing
 transbcks: []

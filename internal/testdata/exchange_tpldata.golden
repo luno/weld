@@ -3,92 +3,92 @@ tags: '!dev'
 backendstype: exchange_ops.Backends
 backendsname: Backends
 imports:
-  example/exchange:
-    name: exchange
-    pkgpath: example/exchange
-    aliased: false
-  example/exchange/db:
-    name: exchange_db
-    pkgpath: example/exchange/db
-    aliased: true
-  example/exchange/ops:
-    name: exchange_ops
-    pkgpath: example/exchange/ops
-    aliased: true
-  example/external/versioned:
-    name: versioned
-    pkgpath: example/external/versioned
-    aliased: false
-  example/external/versioned/v1:
-    name: versioned_v1
-    pkgpath: example/external/versioned/v1
-    aliased: true
-  example/identity/email:
-    name: email
-    pkgpath: example/identity/email
-    aliased: false
-  example/identity/email/client/grpc:
-    name: email_client_grpc
-    pkgpath: example/identity/email/client/grpc
-    aliased: true
-  example/identity/users:
-    name: users
-    pkgpath: example/identity/users
-    aliased: false
-  example/identity/users/client/grpc:
-    name: users_client_grpc
-    pkgpath: example/identity/users/client/grpc
-    aliased: true
+    example/exchange:
+        name: exchange
+        pkgpath: example/exchange
+        aliased: false
+    example/exchange/db:
+        name: exchange_db
+        pkgpath: example/exchange/db
+        aliased: true
+    example/exchange/ops:
+        name: exchange_ops
+        pkgpath: example/exchange/ops
+        aliased: true
+    example/external/versioned:
+        name: versioned
+        pkgpath: example/external/versioned
+        aliased: false
+    example/external/versioned/v1:
+        name: versioned_v1
+        pkgpath: example/external/versioned/v1
+        aliased: true
+    example/identity/email:
+        name: email
+        pkgpath: example/identity/email
+        aliased: false
+    example/identity/email/client/grpc:
+        name: email_client_grpc
+        pkgpath: example/identity/email/client/grpc
+        aliased: true
+    example/identity/users:
+        name: users
+        pkgpath: example/identity/users
+        aliased: false
+    example/identity/users/client/grpc:
+        name: users_client_grpc
+        pkgpath: example/identity/users/client/grpc
+        aliased: true
 params: []
 deps:
-- type: email.Client
-  var: email
-  getter: Email
-  isduplicate: false
-  provider:
-    funcpkg: email_client_grpc
-    funcname: New
-    returnserr: true
-    params: []
-    errwrapmsg: email client grpc new
-- type: '*exchange_db.ExchangeDB'
-  var: exchangeDB
-  getter: ExchangeDB
-  isduplicate: false
-  provider:
-    funcpkg: exchange_db
-    funcname: Connect
-    returnserr: true
-    params: []
-    errwrapmsg: exchange db connect
-- type: chan<- exchange.Model
-  var: modelChan
-  getter: ModelChan
-  isduplicate: false
-  provider:
-    funcpkg: ""
-    funcname: NewModelChan
-    returnserr: false
-    params: []
-    errwrapmsg: exchange state new model chan
-- type: users.Client
-  var: users
-  getter: Users
-  isduplicate: false
-  provider:
-    funcpkg: users_client_grpc
-    funcname: New
-    returnserr: true
-    params: []
-    errwrapmsg: users client grpc new
-- type: '*versioned_v1.Service'
-  var: versioned
-  getter: Versioned
-  isduplicate: false
-  provider:
-    funcpkg: versioned
-    funcname: New
-    returnserr: false
-    params: []
-    errwrapmsg: versioned new
+    - type: email.Client
+      var: email
+      getter: Email
+      isduplicate: false
+      provider:
+        funcpkg: email_client_grpc
+        funcname: New
+        returnserr: true
+        params: []
+        errwrapmsg: email client grpc new
+    - type: '*exchange_db.ExchangeDB'
+      var: exchangeDB
+      getter: ExchangeDB
+      isduplicate: false
+      provider:
+        funcpkg: exchange_db
+        funcname: Connect
+        returnserr: true
+        params: []
+        errwrapmsg: exchange db connect
+    - type: chan<- exchange.Model
+      var: modelChan
+      getter: ModelChan
+      isduplicate: false
+      provider:
+        funcpkg: ""
+        funcname: NewModelChan
+        returnserr: false
+        params: []
+        errwrapmsg: exchange state new model chan
+    - type: users.Client
+      var: users
+      getter: Users
+      isduplicate: false
+      provider:
+        funcpkg: users_client_grpc
+        funcname: New
+        returnserr: true
+        params: []
+        errwrapmsg: users client grpc new
+    - type: '*versioned_v1.Service'
+      var: versioned
+      getter: Versioned
+      isduplicate: false
+      provider:
+        funcpkg: versioned
+        funcname: New
+        returnserr: false
+        params: []
+        errwrapmsg: versioned new
 transbcks: []

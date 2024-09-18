@@ -17,7 +17,7 @@ import (
 	"github.com/luno/jettison/log"
 	"github.com/sebdah/goldie/v2"
 	"github.com/stretchr/testify/require"
-	"gopkg.in/yaml.v3"
+	"gopkg.in/yaml.v2"
 )
 
 //go:generate go test -update

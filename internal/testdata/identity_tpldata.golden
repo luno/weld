@@ -3,120 +3,120 @@ tags: '!dev'
 backendstype: Backends
 backendsname: Backends
 imports:
-  example/exchange:
-    name: exchange
-    pkgpath: example/exchange
-    aliased: false
-  example/exchange/client/grpc:
-    name: exchange_client_grpc
-    pkgpath: example/exchange/client/grpc
-    aliased: true
-  example/external/mail:
-    name: mail
-    pkgpath: example/external/mail
-    aliased: false
-  example/external/mail/mail:
-    name: mail_mail
-    pkgpath: example/external/mail/mail
-    aliased: true
-  example/identity/email:
-    name: email
-    pkgpath: example/identity/email
-    aliased: false
-  example/identity/email/client/logical:
-    name: email_client_logical
-    pkgpath: example/identity/email/client/logical
-    aliased: true
-  example/identity/email/db:
-    name: email_db
-    pkgpath: example/identity/email/db
-    aliased: true
-  example/identity/users:
-    name: users
-    pkgpath: example/identity/users
-    aliased: false
-  example/identity/users/client/logical:
-    name: users_client_logical
-    pkgpath: example/identity/users/client/logical
-    aliased: true
-  example/identity/users/db:
-    name: users_db
-    pkgpath: example/identity/users/db
-    aliased: true
+    example/exchange:
+        name: exchange
+        pkgpath: example/exchange
+        aliased: false
+    example/exchange/client/grpc:
+        name: exchange_client_grpc
+        pkgpath: example/exchange/client/grpc
+        aliased: true
+    example/external/mail:
+        name: mail
+        pkgpath: example/external/mail
+        aliased: false
+    example/external/mail/mail:
+        name: mail_mail
+        pkgpath: example/external/mail/mail
+        aliased: true
+    example/identity/email:
+        name: email
+        pkgpath: example/identity/email
+        aliased: false
+    example/identity/email/client/logical:
+        name: email_client_logical
+        pkgpath: example/identity/email/client/logical
+        aliased: true
+    example/identity/email/db:
+        name: email_db
+        pkgpath: example/identity/email/db
+        aliased: true
+    example/identity/users:
+        name: users
+        pkgpath: example/identity/users
+        aliased: false
+    example/identity/users/client/logical:
+        name: users_client_logical
+        pkgpath: example/identity/users/client/logical
+        aliased: true
+    example/identity/users/db:
+        name: users_db
+        pkgpath: example/identity/users/db
+        aliased: true
 params: []
 deps:
-- type: email.Client
-  var: email
-  getter: Email
-  isduplicate: false
-  provider:
-    funcpkg: email_client_logical
-    funcname: New
-    returnserr: false
-    params:
-    - '&b'
-    errwrapmsg: email client logical new
-- type: '*email_db.EmailDB'
-  var: emailDB
-  getter: EmailDB
-  isduplicate: false
-  provider:
-    funcpkg: email_db
-    funcname: Connect
-    returnserr: true
-    params: []
-    errwrapmsg: email db connect
-- type: exchange.Client
-  var: exchange
-  getter: Exchange
-  isduplicate: false
-  provider:
-    funcpkg: exchange_client_grpc
-    funcname: New
-    returnserr: true
-    params: []
-    errwrapmsg: exchange client grpc new
-- type: '*mail.Mailer'
-  var: mailer
-  getter: Mailer
-  isduplicate: false
-  provider:
-    funcpkg: mail
-    funcname: New
-    returnserr: true
-    params: []
-    errwrapmsg: mail new
-- type: '*mail_mail.MailerLegacy'
-  var: mailerLegacy
-  getter: MailerLegacy
-  isduplicate: false
-  provider:
-    funcpkg: mail_mail
-    funcname: New
-    returnserr: true
-    params: []
-    errwrapmsg: mail new
-- type: users.Client
-  var: users
-  getter: Users
-  isduplicate: false
-  provider:
-    funcpkg: users_client_logical
-    funcname: New
-    returnserr: false
-    params:
-    - '&b'
-    errwrapmsg: users client logical new
-- type: '*users_db.UsersDB'
-  var: usersDB
-  getter: UsersDB
-  isduplicate: false
-  provider:
-    funcpkg: users_db
-    funcname: Connect
-    returnserr: true
-    params: []
-    errwrapmsg: users db connect
+    - type: email.Client
+      var: email
+      getter: Email
+      isduplicate: false
+      provider:
+        funcpkg: email_client_logical
+        funcname: New
+        returnserr: false
+        params:
+            - '&b'
+        errwrapmsg: email client logical new
+    - type: '*email_db.EmailDB'
+      var: emailDB
+      getter: EmailDB
+      isduplicate: false
+      provider:
+        funcpkg: email_db
+        funcname: Connect
+        returnserr: true
+        params: []
+        errwrapmsg: email db connect
+    - type: exchange.Client
+      var: exchange
+      getter: Exchange
+      isduplicate: false
+      provider:
+        funcpkg: exchange_client_grpc
+        funcname: New
+        returnserr: true
+        params: []
+        errwrapmsg: exchange client grpc new
+    - type: '*mail.Mailer'
+      var: mailer
+      getter: Mailer
+      isduplicate: false
+      provider:
+        funcpkg: mail
+        funcname: New
+        returnserr: true
+        params: []
+        errwrapmsg: mail new
+    - type: '*mail_mail.MailerLegacy'
+      var: mailerLegacy
+      getter: MailerLegacy
+      isduplicate: false
+      provider:
+        funcpkg: mail_mail
+        funcname: New
+        returnserr: true
+        params: []
+        errwrapmsg: mail new
+    - type: users.Client
+      var: users
+      getter: Users
+      isduplicate: false
+      provider:
+        funcpkg: users_client_logical
+        funcname: New
+        returnserr: false
+        params:
+            - '&b'
+        errwrapmsg: users client logical new
+    - type: '*users_db.UsersDB'
+      var: usersDB
+      getter: UsersDB
+      isduplicate: false
+      provider:
+        funcpkg: users_db
+        funcname: Connect
+        returnserr: true
+        params: []
+        errwrapmsg: users db connect
 transbcks:
-- email_client_logical.Backends
-- users_client_logical.Backends
+    - email_client_logical.Backends
+    - users_client_logical.Backends

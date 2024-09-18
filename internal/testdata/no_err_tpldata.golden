@@ -5,14 +5,14 @@ backendsname: Backends
 imports: {}
 params: []
 deps:
-- type: bool
-  var: foo
-  getter: Foo
-  isduplicate: false
-  provider:
-    funcpkg: ""
-    funcname: foo
-    returnserr: false
-    params: []
-    errwrapmsg: no_err state foo
+    - type: bool
+      var: foo
+      getter: Foo
+      isduplicate: false
+      provider:
+        funcpkg: ""
+        funcname: foo
+        returnserr: false
+        params: []
+        errwrapmsg: no_err state foo
 transbcks: []

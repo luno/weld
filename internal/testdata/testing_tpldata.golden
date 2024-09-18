@@ -5,14 +5,14 @@ backendsname: Backends
 imports: {}
 params: []
 deps:
-- type: Foo
-  var: foo
-  getter: Foo
-  isduplicate: false
-  provider:
-    funcpkg: ""
-    funcname: MakeFoo
-    returnserr: false
-    params: []
-    errwrapmsg: testing state make foo
+    - type: Foo
+      var: foo
+      getter: Foo
+      isduplicate: false
+      provider:
+        funcpkg: ""
+        funcname: MakeFoo
+        returnserr: false
+        params: []
+        errwrapmsg: testing state make foo
 transbcks: []

@@ -3,30 +3,30 @@ tags: ""
 backendstype: Backends
 backendsname: Backends
 imports:
-  example/samevar/pool:
-    name: pool
-    pkgpath: example/samevar/pool
-    aliased: false
+    example/samevar/pool:
+        name: pool
+        pkgpath: example/samevar/pool
+        aliased: false
 params: []
 deps:
-- type: '*pool.BarPool'
-  var: pool
-  getter: GetPool
-  isduplicate: false
-  provider:
-    funcpkg: pool
-    funcname: NewBarPool
-    returnserr: false
-    params: []
-    errwrapmsg: pool new bar pool
-- type: '*pool.FooPool'
-  var: pool1
-  getter: Pool
-  isduplicate: false
-  provider:
-    funcpkg: pool
-    funcname: NewFooPool
-    returnserr: false
-    params: []
-    errwrapmsg: pool new foo pool
+    - type: '*pool.BarPool'
+      var: pool
+      getter: GetPool
+      isduplicate: false
+      provider:
+        funcpkg: pool
+        funcname: NewBarPool
+        returnserr: false
+        params: []
+        errwrapmsg: pool new bar pool
+    - type: '*pool.FooPool'
+      var: pool1
+      getter: Pool
+      isduplicate: false
+      provider:
+        funcpkg: pool
+        funcname: NewFooPool
+        returnserr: false
+        params: []
+        errwrapmsg: pool new foo pool
 transbcks: []

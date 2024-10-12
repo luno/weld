@@ -313,7 +313,6 @@ func makeTypeRef(pkgCache *PkgCache, typ types.Type) (string, error) {
 	}
 
 	res := typ.String()
-
 	for _, pkg := range pkgs {
 		if pkg.Path() == pkgCache.In {
 			res = strings.ReplaceAll(res, pkg.Path()+".", "")
@@ -553,6 +552,14 @@ func getTypePkgs(tl ...types.Type) ([]*types.Package, error) {
 			pkg := t.Obj().Pkg()
 			if pkg != nil {
 				pl = []*types.Package{pkg}
+			}
+
+			for i := 0; i < t.TypeArgs().Len(); i++ {
+				generics, err := getTypePkgs(t.TypeArgs().At(i))
+				if err != nil {
+					return nil, err
+				}
+				pl = append(pl, generics...)
 			}
 		case *types.Map:
 			pl, err = getTypePkgs(t.Elem(), t.Key())

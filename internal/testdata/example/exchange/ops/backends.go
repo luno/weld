@@ -8,7 +8,12 @@ import (
 	"example/identity/users"
 )
 
+type TestFunc[T any, C any] func(a T, c C) string
+
+type GenericStringType = TestFunc[exchange.Model, string]
+
 type Backends interface {
+	GenericStringFunc() GenericStringType
 	ExchangeDB() *db.ExchangeDB
 	Email() email.Client
 	Users() users.Client

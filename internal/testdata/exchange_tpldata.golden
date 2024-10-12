@@ -61,6 +61,16 @@ deps:
         returnserr: true
         params: []
         errwrapmsg: exchange db connect
+    - type: exchange_ops.TestFunc[exchange.Model, string]
+      var: genericStringFunc
+      getter: GenericStringFunc
+      isduplicate: false
+      provider:
+        funcpkg: ""
+        funcname: NewGenericStringType
+        returnserr: false
+        params: []
+        errwrapmsg: exchange state new generic string type
     - type: chan<- exchange.Model
       var: modelChan
       getter: ModelChan

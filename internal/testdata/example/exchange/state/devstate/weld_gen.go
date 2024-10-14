@@ -42,6 +42,8 @@ func MakeBackends() (exchange_ops.Backends, error) {
 		return nil, errors.Wrap(err, "exchange db connect")
 	}
 
+	b.genericStringFunc = exchange_state.NewGenericStringType()
+
 	b.modelChan = exchange_state.NewModelChan()
 
 	b.users, err = users_client_dev.Make(&b)
@@ -60,13 +62,14 @@ func MakeBackends() (exchange_ops.Backends, error) {
 }
 
 type backendsImpl struct {
-	email      email.Client
-	emailDB    *email_db.EmailDB
-	exchangeDB *exchange_db.ExchangeDB
-	modelChan  chan<- exchange.Model
-	users      users.Client
-	usersDB    *users_db.UsersDB
-	versioned  *versioned_v1.Service
+	email             email.Client
+	emailDB           *email_db.EmailDB
+	exchangeDB        *exchange_db.ExchangeDB
+	genericStringFunc exchange_ops.TestFunc[exchange.Model, string]
+	modelChan         chan<- exchange.Model
+	users             users.Client
+	usersDB           *users_db.UsersDB
+	versioned         *versioned_v1.Service
 }
 
 func (b *backendsImpl) Email() email.Client {
@@ -79,6 +82,10 @@ func (b *backendsImpl) EmailDB() *email_db.EmailDB {
 
 func (b *backendsImpl) ExchangeDB() *exchange_db.ExchangeDB {
 	return b.exchangeDB
+}
+
+func (b *backendsImpl) GenericStringFunc() exchange_ops.TestFunc[exchange.Model, string] {
+	return b.genericStringFunc
 }
 
 func (b *backendsImpl) ModelChan() chan<- exchange.Model {

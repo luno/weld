@@ -1,1 +1,1 @@
-example/exchange/ops.Backends[5]: *example/exchange/db.ExchangeDB, *example/external/versioned/v1.Service, chan<- example/exchange.Model, example/identity/email.Client, example/identity/users.Client
+example/exchange/ops.Backends[6]: *example/exchange/db.ExchangeDB, *example/external/versioned/v1.Service, chan<- example/exchange.Model, example/exchange/ops.TestFunc[example/exchange.Model, string], example/identity/email.Client, example/identity/users.Client

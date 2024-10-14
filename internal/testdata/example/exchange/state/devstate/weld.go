@@ -13,6 +13,10 @@ import (
 //go:generate weld
 
 var _ = weld.NewSpec(
-	weld.NewSet(state.ChanProvider, providers.WeldDev),
+	weld.NewSet(
+		state.ChanProvider,
+		providers.WeldDev,
+		state.NewGenericStringType,
+	),
 	weld.Existing(new(exchange_ops.Backends)),
 )

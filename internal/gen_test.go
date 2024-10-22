@@ -165,7 +165,7 @@ func TestGenerate(t *testing.T) {
 				Tags:       test.Tags,
 				ForTesting: test.ForTesting,
 			})
-			jtest.Require(t, nil, err)
+			jtest.RequireNil(t, err)
 			require.Empty(t, res.Errors)
 
 			var graph bytes.Buffer

@@ -36,13 +36,13 @@ func execWeldTpl(data TplData) ([]byte, error) {
 	var buf bytes.Buffer
 	err := weldTpl.Execute(&buf, data)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "executing weld template")
 	}
 
 	imports.LocalPrefix = "bitx"
 	src, err := imports.Process("weld_gen.go", buf.Bytes(), nil)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "processing imports")
 	}
 
 	src, err = format.Source(src)
@@ -235,7 +235,13 @@ func makeTplBcks(pkgCache *PkgCache, bcks []Backends) ([]string, error) {
 }
 
 // makeTplDep returns the template dependency and template imports of the dependency.
-func makeTplDep(pkgCache *PkgCache, nodes []Node, getter string, dep types.Type, varMap map[string]string) (*TplDep, error) {
+func makeTplDep(
+	pkgCache *PkgCache,
+	nodes []Node,
+	getter string,
+	dep types.Type,
+	varMap map[string]string,
+) (*TplDep, error) {
 	for _, node := range nodes {
 		if node.Type == NodeTypeBind {
 			if !types.Identical(node.BindInterface, dep) {
@@ -567,8 +573,15 @@ func getTypePkgs(tl ...types.Type) ([]*types.Package, error) {
 			tl := tupleTypes(t.Params())
 			tl = append(tl, tupleTypes(t.Results())...)
 			pl, err = getTypePkgs(tl...)
+
 		default:
-			return nil, errors.New("cannot detect import for type", j.MKV{"type": t})
+			// If the type is not explicitly handled, check its underlying type
+			underlying := t.Underlying()
+			if underlying != t { // If underlying type differs, process it
+				pl, err = getTypePkgs(underlying)
+			} else {
+				return nil, errors.New("cannot detect import for type", j.MKV{"type": t})
+			}
 		}
 
 		if err != nil {

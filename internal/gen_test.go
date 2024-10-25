@@ -26,26 +26,6 @@ import (
 // Since resulting go.sum will change depending latest bitx dependencies, these copies are deleted afterwards.
 // See testdata/example/doc.go for more details.
 func TestMain(m *testing.M) {
-	copies := map[string]string{
-		"testdata/example/gomod": "testdata/example/go.mod",
-		"testdata/example/gosum": "testdata/example/go.sum",
-	}
-
-	// Create copies
-	for actual, expect := range copies {
-		b, err := os.ReadFile(actual)
-		if err != nil {
-			log.Error(nil, errors.Wrap(err, "reading file"))
-			os.Exit(1)
-		}
-
-		err = os.WriteFile(expect, b, 0o644)
-		if err != nil {
-			log.Error(nil, errors.Wrap(err, "writing file"))
-			os.Exit(1)
-		}
-	}
-
 	cmd := exec.Command("go", "mod", "tidy")
 	cmd.Dir = "testdata/example"
 	cmd.Stdout = os.Stdout
@@ -57,15 +37,6 @@ func TestMain(m *testing.M) {
 	}
 
 	m.Run()
-
-	// Delete copies
-	for _, expect := range copies {
-		err := os.Remove(expect)
-		if err != nil {
-			log.Error(nil, errors.Wrap(err, "delete"))
-			os.Exit(1)
-		}
-	}
 }
 
 func TestGenerate(t *testing.T) {
@@ -166,7 +137,7 @@ func TestGenerate(t *testing.T) {
 				ForTesting: test.ForTesting,
 			})
 			jtest.RequireNil(t, err)
-			require.Empty(t, res.Errors)
+			require.Empty(t, res.Errors, res.Errors[0])
 
 			var graph bytes.Buffer
 			printNode(&graph, res.Root, 0, true)

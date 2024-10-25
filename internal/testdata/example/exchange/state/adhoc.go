@@ -1,11 +1,11 @@
 package state
 
 import (
+	"exchange"
+	"exchange/ops"
 	"fmt"
 
 	"github.com/luno/weld"
-	"github.com/luno/weld/internal/testdata/example/exchange"
-	"github.com/luno/weld/internal/testdata/example/exchange/ops"
 )
 
 var ChanProvider = weld.NewSet(NewModelChan)

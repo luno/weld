@@ -8,3 +8,7 @@
 
 # Output of go coverage
 *.out
+
+# Go
+go.work
+go.work.sum

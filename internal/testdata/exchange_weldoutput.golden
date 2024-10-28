@@ -51,7 +51,7 @@ func MakeBackends() (exchange_ops.Backends, error) {
 type backendsImpl struct {
 	email             email.Client
 	exchangeDB        *exchange_db.ExchangeDB
-	genericStringFunc exchange_ops.TestFunc[exchange.Model, string]
+	genericStringFunc exchange_ops.GenericStringType
 	modelChan         chan<- exchange.Model
 	users             users.Client
 	versioned         *versioned_v1.Service
@@ -65,7 +65,7 @@ func (b *backendsImpl) ExchangeDB() *exchange_db.ExchangeDB {
 	return b.exchangeDB
 }
 
-func (b *backendsImpl) GenericStringFunc() exchange_ops.TestFunc[exchange.Model, string] {
+func (b *backendsImpl) GenericStringFunc() exchange_ops.GenericStringType {
 	return b.genericStringFunc
 }
 

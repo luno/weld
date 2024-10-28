@@ -65,7 +65,7 @@ type backendsImpl struct {
 	email             email.Client
 	emailDB           *email_db.EmailDB
 	exchangeDB        *exchange_db.ExchangeDB
-	genericStringFunc exchange_ops.TestFunc[exchange.Model, string]
+	genericStringFunc exchange_ops.GenericStringType
 	modelChan         chan<- exchange.Model
 	users             users.Client
 	usersDB           *users_db.UsersDB
@@ -84,7 +84,7 @@ func (b *backendsImpl) ExchangeDB() *exchange_db.ExchangeDB {
 	return b.exchangeDB
 }
 
-func (b *backendsImpl) GenericStringFunc() exchange_ops.TestFunc[exchange.Model, string] {
+func (b *backendsImpl) GenericStringFunc() exchange_ops.GenericStringType {
 	return b.genericStringFunc
 }
 

@@ -14,4 +14,4 @@ Set[11]: (inline)
       Func[1]: func example/external/mail.New(opts ...example/external/mail.option) (*example/external/mail.Mailer, error)
       Func[1]: func example/external/mail/mail.New() (*example/external/mail/mail.MailerLegacy, error)
       Func[1]: func example/external/versioned.New() *example/external/versioned/v1.Service
-  Func[1]: func example/exchange/state.NewGenericStringType() example/exchange/ops.TestFunc[example/exchange.Model, string]
+  Func[1]: func example/exchange/state.NewGenericStringType() example/exchange/ops.GenericStringType

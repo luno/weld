@@ -92,7 +92,7 @@ deps:
         returnserr: true
         params: []
         errwrapmsg: exchange db connect
-    - type: exchange_ops.TestFunc[exchange.Model, string]
+    - type: exchange_ops.GenericStringType
       var: genericStringFunc
       getter: GenericStringFunc
       isduplicate: false

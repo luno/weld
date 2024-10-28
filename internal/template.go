@@ -235,7 +235,13 @@ func makeTplBcks(pkgCache *PkgCache, bcks []Backends) ([]string, error) {
 }
 
 // makeTplDep returns the template dependency and template imports of the dependency.
-func makeTplDep(pkgCache *PkgCache, nodes []Node, getter string, dep types.Type, varMap map[string]string) (*TplDep, error) {
+func makeTplDep(
+	pkgCache *PkgCache,
+	nodes []Node,
+	getter string,
+	dep types.Type,
+	varMap map[string]string,
+) (*TplDep, error) {
 	for _, node := range nodes {
 		if node.Type == NodeTypeBind {
 			if !types.Identical(node.BindInterface, dep) {
@@ -567,6 +573,11 @@ func getTypePkgs(tl ...types.Type) ([]*types.Package, error) {
 			tl := tupleTypes(t.Params())
 			tl = append(tl, tupleTypes(t.Results())...)
 			pl, err = getTypePkgs(tl...)
+		case *types.Alias:
+			pkg := t.Obj().Pkg()
+			if pkg != nil {
+				pl = []*types.Package{pkg}
+			}
 		default:
 			return nil, errors.New("cannot detect import for type", j.MKV{"type": t})
 		}

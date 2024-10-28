@@ -1,7 +1,7 @@
 Func[1]: func example/exchange/db.Connect() (*example/exchange/db.ExchangeDB, error)
 Func[1]: func example/external/versioned.New() *example/external/versioned/v1.Service
 Func[1]: func example/exchange/state.NewModelChan() chan<- example/exchange.Model
-Func[1]: func example/exchange/state.NewGenericStringType() example/exchange/ops.TestFunc[example/exchange.Model, string]
+Func[1]: func example/exchange/state.NewGenericStringType() example/exchange/ops.GenericStringType
 Bind[1]: example/identity/email.Client(*example/identity/email/client/grpc.client)
 Bind[1]: example/identity/users.Client(*example/identity/users/client/grpc.client)
 Func[1]: func example/identity/email/client/grpc.New() (*example/identity/email/client/grpc.client, error)

@@ -36,18 +36,18 @@ func execWeldTpl(data TplData) ([]byte, error) {
 	var buf bytes.Buffer
 	err := weldTpl.Execute(&buf, data)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "executing weld template")
 	}
 
 	imports.LocalPrefix = "bitx"
 	src, err := imports.Process("weld_gen.go", buf.Bytes(), nil)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "processing imports")
 	}
 
 	src, err = format.Source(src)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "formatting source")
 	}
 
 	return src, nil

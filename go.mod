@@ -3,7 +3,7 @@ module github.com/luno/weld
 go 1.23.2
 
 require (
-	github.com/luno/jettison v0.0.0-20240722160230-b42bd507a5f6
+	github.com/luno/jettison a8d17d1d3f78
 	github.com/sebdah/goldie/v2 v2.5.5
 	github.com/stretchr/testify v1.10.0
 	golang.org/x/tools v0.33.0

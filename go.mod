@@ -1,6 +1,6 @@
 module github.com/luno/weld
 
-go 1.24.3
+go 1.25.0
 
 require (
 	github.com/luno/jettison v0.0.0-20240722160230-b42bd507a5f6

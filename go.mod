@@ -4,7 +4,7 @@ go 1.25.0
 
 require (
 	github.com/luno/jettison v0.0.0-20251004142841-a8f926feeafb
-	github.com/sebdah/goldie/v2 v2.7.1
+	github.com/sebdah/goldie/v2 v2.8.0
 	github.com/stretchr/testify v1.11.1
 	golang.org/x/tools v0.38.0
 	gopkg.in/yaml.v3 v3.0.1

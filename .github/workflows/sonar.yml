@@ -22,7 +22,12 @@ jobs:
           go-version-file: 'go.mod'
 
       - name: Generate Sonar Report
-        run: go test -coverpkg=./... -coverprofile=coverage.out -json ./... > sonar-report.json
+        run: |
+          go test -coverpkg=./... -coverprofile=coverage.out -json ./... > sonar-report.json || {
+            echo "Tests failed with exit code $?"
+            cat sonar-report.json
+            exit 1
+          }
 
       - name: Upload coverage reports to Sonar
         env:

@@ -2,7 +2,7 @@ module github.com/luno/weld
 
 go 1.25
 
-toolchain go1.25.5
+toolchain go1.25.6
 
 require (
 	github.com/luno/jettison v0.0.0-20251220134820-950417e71b66

@@ -1,6 +1,6 @@
 module github.com/luno/weld
 
-go 1.26
+go 1.26.0
 
 toolchain go1.26.1
 

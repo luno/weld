@@ -65,7 +65,7 @@ type ProviderSet struct{}
 // Bind.
 //
 // This type is heavily based on github.com/google/wire.NewSet, see it for more details.
-func NewSet(...interface{}) ProviderSet {
+func NewSet(...any) ProviderSet {
 	return ProviderSet{}
 }
 
@@ -93,7 +93,7 @@ type Binding struct{}
 //	func (*client) List() {}
 //
 //	var Provider = weld.NewSet(New, weld.Bind(new(Client), new(*client)))
-func Bind(iface, to interface{}) Binding {
+func Bind(iface, to any) Binding {
 	return Binding{}
 }
 
@@ -113,7 +113,7 @@ type Backends struct{}
 //	var _ = weld.NewSpec(
 //	    providers.WeldProd,
 //	    weld.GenUnion(new(exchange_ops.Backends), new(matcher_ops.Backends))
-func GenUnion(backends ...interface{}) Backends {
+func GenUnion(backends ...any) Backends {
 	return Backends{}
 }
 
@@ -127,6 +127,6 @@ func GenUnion(backends ...interface{}) Backends {
 //	var _ = weld.NewSpec(
 //	    providers.WeldDev,
 //	    weld.Existing(new(state.Backends))
-func Existing(backends interface{}) Backends {
+func Existing(backends any) Backends {
 	return Backends{}
 }

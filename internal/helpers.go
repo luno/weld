@@ -146,7 +146,7 @@ func (m TypeMap) Put(typ types.Type) bool {
 	return false
 }
 
-func logf(args Args, format string, a ...interface{}) {
+func logf(args Args, format string, a ...any) {
 	if !args.Verbose {
 		return
 	}
@@ -177,8 +177,8 @@ func errWithPos(p haspos, msg string, opts ...errors.Option) error {
 }
 
 func tupleSlice(t *types.Tuple) (res []*types.Var) {
-	for i := 0; i < t.Len(); i++ {
-		res = append(res, t.At(i))
+	for v := range t.Variables() {
+		res = append(res, v)
 	}
 	return res
 }

@@ -3,6 +3,7 @@ package internal
 import (
 	"go/types"
 	"path/filepath"
+	"slices"
 	"sort"
 	"strings"
 
@@ -78,11 +79,8 @@ func (n *Node) AddChild(child *Node) {
 	child.Parent = n
 
 	uniq := make(TypeMap)
-	for _, dep := range n.Deps {
-		if uniq.Put(dep) {
-			n.HasDups = true
-			break
-		}
+	if slices.ContainsFunc(n.Deps, uniq.Put) {
+		n.HasDups = true
 	}
 }
 

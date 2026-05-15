@@ -526,8 +526,8 @@ func getObjPkgs(objs ...types.Object) ([]*types.Package, error) {
 // tupleTypes returns the types of the tuple values.
 func tupleTypes(tuple *types.Tuple) []types.Type {
 	var res []types.Type
-	for i := 0; i < tuple.Len(); i++ {
-		v := tuple.At(i)
+	for v := range tuple.Variables() {
+		v := v
 		res = append(res, v.Type())
 	}
 	return res
@@ -560,8 +560,8 @@ func getTypePkgs(tl ...types.Type) ([]*types.Package, error) {
 				pl = []*types.Package{pkg}
 			}
 
-			for i := 0; i < t.TypeArgs().Len(); i++ {
-				generics, err := getTypePkgs(t.TypeArgs().At(i))
+			for t0 := range t.TypeArgs().Types() {
+				generics, err := getTypePkgs(t0)
 				if err != nil {
 					return nil, err
 				}

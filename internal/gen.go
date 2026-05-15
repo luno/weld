@@ -328,8 +328,8 @@ func newBackends(typ types.Type, parent haspos) (Backends, error) {
 	}
 
 	var deps []BackendsDep
-	for i := 0; i < iface.NumMethods(); i++ {
-		meth := iface.Method(i)
+	for meth := range iface.Methods() {
+		meth := meth
 		sig := meth.Type().(*types.Signature)
 		if sig.Params().Len() > 0 {
 			return Backends{}, errWithPos(meth, "unsupported weld spec Backends with parameterized method", j.MKV{"meth": meth})

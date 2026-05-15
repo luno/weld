@@ -5,7 +5,7 @@ go 1.26.0
 toolchain go1.26.3
 
 require (
-	github.com/luno/jettison v0.0.0-20260430092942-5b6b66078128
+	github.com/luno/jettison v0.0.0-20260515104821-da8c16f4da4e
 	github.com/sebdah/goldie/v2 v2.8.0
 	github.com/stretchr/testify v1.11.1
 	golang.org/x/tools v0.44.0

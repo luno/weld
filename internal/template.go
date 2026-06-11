@@ -308,7 +308,7 @@ func makeTplDep(
 		}
 	}
 
-	return nil, errors.New("dep no found", j.MKV{"getter": getter, "type": dep})
+	return nil, errors.New("dep not found", j.MKV{"getter": getter, "type": dep})
 }
 
 // makeTypeRef return the type reference; including package alias or without package if input package.

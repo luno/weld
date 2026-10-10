@@ -8,7 +8,7 @@ require (
 	github.com/luno/jettison v0.0.0-20260925124914-53a33bc7b509
 	github.com/sebdah/goldie/v2 v2.8.0
 	github.com/stretchr/testify v1.12.1
-	golang.org/x/tools v0.50.0
+	golang.org/x/tools v0.51.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
